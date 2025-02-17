@@ -1,0 +1,50 @@
+{
+  "db_name": "SQLite",
+  "query": "select * from links",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "source",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "is_alias",
+        "ordinal": 2,
+        "type_info": "Bool"
+      },
+      {
+        "name": "target",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "created_time",
+        "ordinal": 4,
+        "type_info": "Datetime"
+      },
+      {
+        "name": "modified_time",
+        "ordinal": 5,
+        "type_info": "Datetime"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "f84a8cc90c70380dfd22fb7fdec7a25d29b7093e1ad4c0d33a63280b72cc6b21"
+}

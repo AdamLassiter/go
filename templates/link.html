@@ -1,0 +1,19 @@
+<div id="link-{{ link.id }}-card" class="row gx-1 py-1 card">
+    <div id="link-{{ link.id }}" class="row gx-1 py-1 card-body">
+        <div id="link-{{ link.id }}-source" class="col">
+            {{ link.source }}
+        </div>
+        <div id="link-{{ link.id }}-target" class="col">
+            {{ link.target }}
+        </div>
+        <div class="col">
+            <a id="link-{{ link.id }}-go" href="{{link.target}}" class="btn btn-primary">
+                Go!
+            </a>
+            <button id="link-{{ link.id }}-delete" class="btn btn-danger" hx-delete="/go/links/{{link.id}}"
+                hx-trigger="click" hx-target="#link-{{link.id}}" hx-swap="delete">
+                Delete
+            </button>
+        </div>
+    </div>
+</div>

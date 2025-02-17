@@ -1,0 +1,20 @@
+<div id="links" class="col">
+    <div id="links-header" class="col py-1">
+        <div class="row gx-1" class="row">
+            <h3 class="col">
+                Alias
+            </h3>
+            <h3 class="col">
+                Target
+            </h3>
+            <h3 class="col">
+                Actions
+            </h3>
+        </div>
+    </div>
+    <div id="links-content" class="col py-1">
+        {% for link in links %}
+        {% include "link.html" %}
+        {% endfor %}
+    </div>
+</div>
