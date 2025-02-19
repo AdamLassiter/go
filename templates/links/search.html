@@ -1,16 +1,19 @@
 <form id="add-form">
-    <div class="row py-2">
-        <div class="col">
+    <div class="d-flex flex-row">
+        <div class="p-1">
             <input class="form-control" placeholder="Alias name" required type="text" name="source">
         </div>
-        <div class="col-6">
-            <input class="form-control" placeholder="Target URL or alias" required type="text" name="target">
+        <div class="flex-grow-1 p-1">
+            <input id="search-input" class="form-control" placeholder="Target URL" required type="url" name="target"">
         </div>
-        <div class="col">
-            <input id="is-alias-checkbox" class="form-check-input" required type="checkbox" value="false">
-            <label for="is-alias-checkbox" class="form-check-label">Is alias?</label>
+        <div class=" p-1 d-flex flex-col">
+            <div class="form-check form-switch my-auto">
+                <input id="is-alias-switch" class="form-check-input" required type="checkbox" value="false"
+                    onchange="syncSearchboxAndCheckbox()">
+                <label for="is-alias-switch" class="form-check-label">Alias?</label>
+            </div>
         </div>
-        <div class="col">
+        <div class="p-1">
             <button class="btn btn-primary form-control" hx-post="/go/links" hx-trigger="click"
                 hx-target="#links-content" hx-swap="beforeend">Add</button>
         </div>

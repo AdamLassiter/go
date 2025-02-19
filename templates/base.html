@@ -15,7 +15,18 @@
     {% block head %}{% endblock %}
 </head>
 
-<body>
+<script>
+    // see utils/navbar.html
+    function syncSearchboxAndCheckbox() {
+        let checkboxElem = document.getElementById("is-alias-switch");
+        let searchElem = document.getElementById("search-input");
+        searchElem.type = checkboxElem.checked ? "text" : "url";
+        searchElem.placeholder = checkboxElem.checked ? "Target 'Go!' alias" : "Target URL";
+    }
+</script>
+
+<body onload="syncSearchboxAndCheckbox()">
+    {%- include "utils/navbar.html" -%}
     <div id="content">
         {% block content %}
         {%- include "utils/loading.html" -%}
