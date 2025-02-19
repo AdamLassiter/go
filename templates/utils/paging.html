@@ -1,0 +1,25 @@
+<nav class="position-absolute start-50 translate-middle-x">
+    <ul class="pagination">
+        <li class="page-item {% if paging.page == 1 %}disabled{% endif %}">
+            <a class="page-link" hx-get="{{ paging.source }}?page={{ paging.page - 1 }}&limit={{ paging.limit }}"
+                hx-target="{{ paging.target }}">Previous</a>
+        </li>
+        {% for n in 1..paging.page %}
+        <li class="page-item">
+            <a class="page-link" hx-get="{{ paging.target }}?page={{ n }}&limit={{ paging.limit }}">{{ n }}</a>
+        </li>
+        {% endfor %}
+        <li class="page-item active">
+            <a class="page-link">{{ paging.page }}</a>
+        </li>
+        {% for n in paging.page+1..paging.last %}
+        <li class="page-item">
+            <a class="page-link" hx-get="{{ paging.target }}?page={{ n }}&limit={{ paging.limit }}">{{ n }}</a>
+        </li>
+        {% endfor %}
+        <li class="page-item {% if paging.page >= paging.last %}disabled{% endif %}">
+            <a class="page-link" hx-get="{{ paging.source }}?page={{ paging.page + 1 }}&limit={{ paging.limit }}"
+                hx-target="{{ paging.target }}">Next</a>
+        </li>
+    </ul>
+</nav>

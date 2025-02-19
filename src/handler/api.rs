@@ -1,7 +1,11 @@
 use std::sync::Arc;
 
 use axum::{
-    extract::{Path, Query, State}, http::StatusCode, response::IntoResponse, routing::get, Json, Router
+    Json, Router,
+    extract::{Path, Query, State},
+    http::StatusCode,
+    response::IntoResponse,
+    routing::get,
 };
 use serde_json::{Value, json};
 use sqlx::Error;
@@ -75,10 +79,10 @@ async fn get_links_handler(
     State(app_state): State<Arc<AppState>>,
     opts: Query<FilterOptions>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<Value>)> {
-    let links = get_links(&app_state, &opts).await.map_err(db_err)?;
+    let (links, last) = get_links(&app_state, &opts).await.map_err(db_err)?;
 
     let json_response = json!({
-        "count": links.len(),
+        "paging": opts.into_paging(last, "/api/links", ""),
         "links": links
     });
 
@@ -143,14 +147,11 @@ async fn delete_link_handler(
 pub fn router(app_state: Arc<AppState>) -> Router {
     Router::new()
         .route("/healthcheck", get(health_check_handler))
-        .route(
-            "/links",
-            get(get_links_handler).post(create_link_handler),
-        )
+        .route("/links", get(get_links_handler).post(create_link_handler))
         .route(
             "/links/{id}",
             get(get_link_handler)
-                .patch(edit_link_handler)
+                .put(edit_link_handler)
                 .delete(delete_link_handler),
         )
         .with_state(app_state)

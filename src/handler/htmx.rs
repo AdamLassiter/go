@@ -2,14 +2,18 @@ use std::sync::Arc;
 
 use askama::Template;
 use axum::{
-    extract::{Path, Query, State}, http::StatusCode, response::{Html, IntoResponse}, routing::get, Form, Router
+    Form, Router,
+    extract::{Path, Query, State},
+    http::StatusCode,
+    response::{Html, IntoResponse},
+    routing::get,
 };
 
 use crate::{
     AppState,
-    schema::{CreateLink, FilterOptions, GetLink},
-    service::{create_link, get_link, get_links},
-    template::{ErrorTemplate, IndexTemplate, LinkTemplate, LinksTemplate},
+    schema::{CreateLink, DeleteLink, FilterOptions, GetLink, UpdateLink},
+    service::{create_link, delete_link, edit_link, get_link, get_links},
+    template::{ErrorTemplate, LinksTemplate, ListTemplate, ViewTemplate},
 };
 
 fn db_err(err: sqlx::Error) -> (StatusCode, Html<String>) {
@@ -29,7 +33,7 @@ fn tp_err(err: askama::Error) -> (StatusCode, Html<String>) {
 }
 
 pub async fn index_handler() -> Result<impl IntoResponse, (StatusCode, Html<String>)> {
-    let template_response = IndexTemplate {}.render().map_err(tp_err)?;
+    let template_response = LinksTemplate {}.render().map_err(tp_err)?;
 
     Ok(Html(template_response))
 }
@@ -38,9 +42,10 @@ async fn get_links_handler(
     State(app_state): State<Arc<AppState>>,
     opts: Query<FilterOptions>,
 ) -> Result<impl IntoResponse, (StatusCode, Html<String>)> {
-    let links = get_links(&app_state, &opts).await.map_err(db_err)?;
+    let (links, last) = get_links(&app_state, &opts).await.map_err(db_err)?;
+    let paging = opts.into_paging(last, "/go/links", "#links");
 
-    let template_response = LinksTemplate { links }.render().map_err(tp_err)?;
+    let template_response = ListTemplate { links, paging }.render().map_err(tp_err)?;
 
     Ok(Html(template_response))
 }
@@ -51,7 +56,21 @@ async fn create_link_handler(
 ) -> Result<impl IntoResponse, (StatusCode, Html<String>)> {
     let link = create_link(&app_state, &body).await.map_err(db_err)?;
 
-    let template_response = LinkTemplate { link }.render().map_err(tp_err)?;
+    let template_response = ViewTemplate { link }.render().map_err(tp_err)?;
+
+    Ok(Html(template_response))
+}
+
+async fn edit_link_handler(
+    State(app_state): State<Arc<AppState>>,
+    Path(id): Path<i64>,
+    Form(body): Form<UpdateLink>,
+) -> Result<impl IntoResponse, (StatusCode, Html<String>)> {
+    let link = edit_link(&app_state, &GetLink { id }, &body)
+        .await
+        .map_err(db_err)?;
+
+    let template_response = ViewTemplate { link }.render().map_err(tp_err)?;
 
     Ok(Html(template_response))
 }
@@ -64,14 +83,33 @@ async fn get_link_handler(
         .await
         .map_err(db_err)?;
 
-    let template_response = LinkTemplate { link }.render().map_err(tp_err)?;
+    let template_response = ViewTemplate { link }.render().map_err(tp_err)?;
 
     Ok(Html(template_response))
 }
 
+async fn delete_link_handler(
+    State(app_state): State<Arc<AppState>>,
+    Path(id): Path<i64>,
+) -> Result<impl IntoResponse, (StatusCode, Html<String>)> {
+    delete_link(&app_state, &DeleteLink { id })
+        .await
+        .map_err(db_err)?;
+
+    Ok(Html(()))
+}
+
 pub fn router(app_state: Arc<AppState>) -> Router {
     Router::new()
-        .route("/links", get(get_links_handler).post(create_link_handler))
-        .route("/links/{id}", get(get_link_handler))
+        .route(
+            "/links",
+            get(get_links_handler)
+                .post(create_link_handler)
+                .put(edit_link_handler),
+        )
+        .route(
+            "/links/{id}",
+            get(get_link_handler).delete(delete_link_handler),
+        )
         .with_state(app_state)
 }

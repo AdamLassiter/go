@@ -1,0 +1,21 @@
+<div class="row gx-1 py-1">
+    <div id="link-{{ link.id }}-card" class="card">
+        <div id="link-{{ link.id }}" class="card-body d-flex flex-row">
+            <div id="link-{{ link.id }}-source" class="col-2 p-1">
+                {{ link.source }}
+            </div>
+            <div id="link-{{ link.id }}-target" class="p-1 flex-grow-1">
+                {{ link.target }}
+            </div>
+            <div class="p-1">
+                <a id="link-{{ link.id }}-go" href="{{ link.target }}" class="btn btn-primary">
+                    Go!
+                </a>
+                <button id="link-{{ link.id }}-delete" class="btn btn-danger" hx-delete="/go/links/{{link.id}}"
+                    hx-trigger="click" hx-target="#link-{{ link.id }}-card" hx-swap="delete">
+                    🗑️
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

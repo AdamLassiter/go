@@ -2,7 +2,6 @@ use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 
-
 #[derive(Debug, FromRow, Deserialize, Serialize)]
 pub struct Link {
     pub id: i64,
@@ -13,5 +12,15 @@ pub struct Link {
 
     pub source: String,
     pub is_alias: bool,
+    pub target: String,
+}
+
+#[derive(Debug, FromRow, Deserialize, Serialize, Default)]
+pub struct Paging {
+    pub page: usize,
+    pub limit: usize,
+    pub last: usize,
+
+    pub source: String,
     pub target: String,
 }

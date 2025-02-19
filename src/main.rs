@@ -1,9 +1,11 @@
+#![feature(int_roundings)]
+
 mod handler;
 mod model;
 mod route;
 mod schema;
-mod template;
 mod service;
+mod template;
 
 use std::{env, sync::Arc};
 

@@ -1,25 +1,49 @@
-use crate::model::Link;
+use crate::model::{Link, Paging};
 
 use serde::{Deserialize, Serialize};
 use sqlx::{
     Sqlite,
-    query::{Query, QueryAs},
+    query::{Query, QueryAs, QueryScalar},
     sqlite::SqliteArguments,
 };
 
-#[derive(Deserialize, Debug, Default)]
+fn default_page() -> usize {
+    1
+}
+fn default_limit() -> usize {
+    10
+}
+
+#[derive(Deserialize, Debug, Default, Clone, Copy)]
 pub struct FilterOptions {
-    pub page: Option<usize>,
-    pub limit: Option<usize>,
+    #[serde(default = "default_page")]
+    pub page: usize,
+    #[serde(default = "default_limit")]
+    pub limit: usize,
 }
 impl FilterOptions {
     pub fn as_query(&self) -> QueryAs<'_, Sqlite, Link, SqliteArguments<'_>> {
-        let limit = self.limit.unwrap_or(10);
-        let offset = (self.page.unwrap_or(1) - 1) * limit;
+        let offset = (self.page - 1) * self.limit;
 
         sqlx::query_as::<_, Link>(r#"select * from links order by id limit ? offset ?"#)
-            .bind(limit as i32)
+            .bind(self.limit as i32)
             .bind(offset as i32)
+    }
+
+    pub fn as_count(&self) -> QueryScalar<'_, Sqlite, i64, SqliteArguments<'_>> {
+        sqlx::query_scalar(r#"select count(*) from links"#)
+    }
+
+    pub fn into_paging(self, last: usize, source: &str, target: &str) -> Paging {
+        let page = self.page;
+        let limit = self.limit;
+        Paging {
+            page,
+            limit,
+            last,
+            source: source.to_string(),
+            target: target.to_string(),
+        }
     }
 }
 
@@ -60,11 +84,13 @@ pub struct CreateLink {
     pub target: String,
 }
 impl CreateLink {
-    pub fn as_query(&self) -> Query<'_, Sqlite, SqliteArguments<'_>> {
-        sqlx::query(r#"insert into links (source, is_alias, target) values (?, ?, ?)"#)
-            .bind(&self.source)
-            .bind(self.is_alias)
-            .bind(&self.target)
+    pub fn as_query(&self) -> QueryAs<'_, Sqlite, Link, SqliteArguments<'_>> {
+        sqlx::query_as::<_, Link>(
+            r#"insert into links (source, is_alias, target) values (?, ?, ?) returning *"#,
+        )
+        .bind(&self.source)
+        .bind(self.is_alias)
+        .bind(&self.target)
     }
 }
 
@@ -76,11 +102,13 @@ pub struct UpdateLink {
     pub target: String,
 }
 impl UpdateLink {
-    pub fn as_query(&self, id: i64) -> Query<'_, Sqlite, SqliteArguments<'_>> {
-        sqlx::query(r#"update links where id = ? set source = ?, is_alias = ?, target = ?"#)
-            .bind(id)
-            .bind(&self.source)
-            .bind(self.is_alias)
-            .bind(&self.target)
+    pub fn as_query(&self, id: i64) -> QueryAs<'_, Sqlite, Link, SqliteArguments<'_>> {
+        sqlx::query_as(
+            r#"update links where id = ? set source = ?, is_alias = ?, target = ? returning *"#,
+        )
+        .bind(id)
+        .bind(&self.source)
+        .bind(self.is_alias)
+        .bind(&self.target)
     }
 }

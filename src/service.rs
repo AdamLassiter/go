@@ -1,4 +1,3 @@
-
 use sqlx::Error;
 
 use crate::{
@@ -7,19 +6,18 @@ use crate::{
     schema::{CreateLink, DeleteLink, FilterOptions, FindLink, GetLink, UpdateLink},
 };
 
-pub async fn get_links(app_state: &AppState, opts: &FilterOptions) -> Result<Vec<Link>, Error> {
+pub async fn get_links(app_state: &AppState, opts: &FilterOptions) -> Result<(Vec<Link>, usize), Error> {
     let links = opts.as_query().fetch_all(&app_state.db).await?;
+    let count = opts.as_count().fetch_one(&app_state.db).await?;
+    let last = (count as usize).div_ceil(opts.limit);
 
-    Ok(links)
+    Ok((links, last))
 }
 
 pub async fn create_link(app_state: &AppState, create: &CreateLink) -> Result<Link, Error> {
-    create.as_query().execute(&app_state.db).await?;
+    let link = create.as_query().fetch_one(&app_state.db).await?;
 
-    let find = FindLink {
-        source: create.source.clone(),
-    };
-    find_link(app_state, &find).await
+    Ok(link)
 }
 
 pub async fn find_link(app_state: &AppState, find: &FindLink) -> Result<Link, Error> {
@@ -42,13 +40,9 @@ pub async fn edit_link(
     // Check exists
     get_link(app_state, get).await?;
 
-    let update_result = update.as_query(get.id).execute(&app_state.db).await?;
+    let link = update.as_query(get.id).fetch_one(&app_state.db).await?;
 
-    if update_result.rows_affected() == 0 {
-        return Err(Error::RowNotFound);
-    }
-
-    get_link(app_state, get).await
+    Ok(link)
 }
 
 pub async fn delete_link(app_state: &AppState, delete: &DeleteLink) -> Result<(), Error> {
