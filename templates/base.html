@@ -17,11 +17,14 @@
 
 <script>
     // see utils/navbar.html
-    function syncSearchboxAndCheckbox() {
-        let checkboxElem = document.getElementById("is-alias-switch");
-        let searchElem = document.getElementById("search-input");
-        searchElem.type = checkboxElem.checked ? "text" : "url";
-        searchElem.placeholder = checkboxElem.checked ? "Target 'Go!' alias" : "Target URL";
+    function syncSearchboxAndCheckbox(id) {
+        let checkboxElem = document.getElementById(`is-alias-switch-${id}`);
+        let textboxElem = document.getElementById(`target-input-${id}`);
+        let labelElem = document.getElementById(`target-input-${id}-label`);
+        let isAlias = checkboxElem.checked;
+        textboxElem.type = isAlias ? "text" : "url";
+        textboxElem.placeholder = isAlias ? "go <alias>" : "https://example.com";
+        labelElem.textContent = isAlias ? "Alias" : "URL";
     }
 </script>
 

@@ -1,21 +1,38 @@
-<form id="add-form">
-    <div class="d-flex flex-row">
-        <div class="p-1">
-            <input class="form-control" placeholder="Alias name" required type="text" name="source">
+<form id="add-form" class="d-flex flex-row flex-grow-1">
+    <div class="d-flex flex-row flex-grow-1">
+        <div class="p-1 d-flex flex-col">
+            <div class="input-group my-auto">
+                <span class="input-group-text" id="source-input-search-label">Alias</span>
+                <input class="form-control" placeholder="go <alias>" required type="text" name="source"
+                    aria-describedby="source-input-search-label">
+            </div>
         </div>
-        <div class="flex-grow-1 p-1">
-            <input id="search-input" class="form-control" placeholder="Target URL" required type="url" name="target"">
-        </div>
-        <div class=" p-1 d-flex flex-col">
+        <div class="p-1 d-flex flex-col">
             <div class="form-check form-switch my-auto">
-                <input id="is-alias-switch" class="form-check-input" required type="checkbox" value="false"
-                    onchange="syncSearchboxAndCheckbox()">
+                <input id="is-alias-switch-search" class="form-check-input" required type="checkbox" value="false"
+                    onchange="syncSearchboxAndCheckbox('search')">
                 <label for="is-alias-switch" class="form-check-label">Alias?</label>
             </div>
         </div>
+        <div class="p-1 d-flex flex-col">
+            <div class="input-group my-auto">
+                <span class="input-group-text" id="target-input-search-label">URL</span>
+                <input id="target-input-search" class="form-control" placeholder="Target URL" required type="url"
+                    name="target" aria-describedby="target-input-search-label">
+            </div>
+        </div>
+        <div class="d-flex flex-row flex-grow-1"></div>
         <div class="p-1">
             <button class="btn btn-primary form-control" hx-post="/go/links" hx-trigger="click"
-                hx-target="#links-content" hx-swap="beforeend">Add</button>
+                hx-target="#links-content" hx-swap="beforeend">
+                🔎 Search
+            </button>
+        </div>
+        <div class="p-1">
+            <button class="btn btn-success form-control" hx-post="/go/links" hx-trigger="click"
+                hx-target="#links-content" hx-swap="beforeend">
+                + Add
+            </button>
         </div>
     </div>
 </form>

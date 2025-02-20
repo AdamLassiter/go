@@ -13,7 +13,6 @@ fn default_page() -> usize {
 fn default_limit() -> usize {
     10
 }
-
 #[derive(Deserialize, Debug, Default, Clone, Copy)]
 pub struct FilterOptions {
     #[serde(default = "default_page")]
@@ -45,6 +44,15 @@ impl FilterOptions {
             target: target.to_string(),
         }
     }
+}
+
+fn default_editable() -> bool {
+    false
+}
+#[derive(Deserialize, Debug, Default, Clone, Copy)]
+pub struct ViewOptions {
+    #[serde(default = "default_editable")]
+    pub editable: bool,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

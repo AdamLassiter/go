@@ -1,18 +1,40 @@
-<form id="edit-form">
-    <div class="row py-2">
-        <div class="col">
-            <input class="form-control" placeholder="Alias name" required type="text" name="source">
-        </div>
-        <div class="col-6">
-            <input class="form-control" placeholder="Target URL or alias" required type="text" name="target">
-        </div>
-        <div class="col">
-            <input id="is-alias-checkbox" class="form-check-input" required type="checkbox" value="false">
-            <label for="is-alias-checkbox" class="form-check-label">Is alias?</label>
-        </div>
-        <div class="col">
-            <button class="btn btn-primary form-control" hx-put="/go/links/{{ id }}" hx-trigger="click"
-                hx-target="#links-content" hx-swap="beforeend">Add</button>
-        </div>
+<div id="link-{{ link.id }}" class="row gx-1 py-1">
+    <div id="link-{{ link.id }}-card" class="card">
+        <form id="edit-form" class="card-body d-flex flex-row">
+            <div class="col-2 p-1">
+                <div class="input-group">
+                    <span class="input-group-text" id="source-input-{{ link.id }}-label">Alias</span>
+                    <input class="form-control" placeholder="go <alias>" required type="text" name="source"
+                        value="{{ link.source }}" aria-labelledby="source-input-{{ link.id }}-label">
+                </div>
+            </div>
+            <div class=" p-1 d-flex flex-col">
+                <div class="form-check form-switch my-auto">
+                    <input id="is-alias-switch-{{ link.id }}" class="form-check-input" required type="checkbox"
+                        value="{{ link.is_alias }}" onchange="syncSearchboxAndCheckbox('{{ link.id }}')">
+                    <label for="is-alias-switch" class="form-check-label">Alias?</label>
+                </div>
+            </div>
+            <div class="flex-grow-1 p-1">
+                <div class="input-group">
+                    <span class="input-group-text" id="target-input-{{ link.id }}-label">URL</span>
+                    <input id="target-input-{{ link.id }}" class="form-control" placeholder="Target URL" required
+                        type="url" name="target" value="{{ link.target }}"
+                        aria-labelledby="target-input-{{ link.id }}-label">
+                </div>
+            </div>
+            <div class=" p-1 d-flex flex-col">
+                <button class="btn btn-secondary form-control" hx-get="/go/links/{{ link.id }}" hx-trigger="click"
+                    hx-target="#link-{{ link.id }}" hx-swap="outerHTML">
+                    🗙 Cancel
+                </button>
+            </div>
+            <div class=" p-1 d-flex flex-col">
+                <button class="btn btn-primary form-control" hx-put="/go/links/{{ link.id }}" hx-trigger="click"
+                    hx-target="#link-{{ link.id }}" hx-swap="outerHTML">
+                    💾 Save
+                </button>
+            </div>
+        </form>
     </div>
-</form>
+</div>

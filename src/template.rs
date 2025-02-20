@@ -9,6 +9,12 @@ pub struct ViewTemplate {
 }
 
 #[derive(Template)]
+#[template(path = "links/edit.html")]
+pub struct EditTemplate {
+    pub link: Link,
+}
+
+#[derive(Template)]
 #[template(path = "links/list.html")]
 pub struct ListTemplate {
     pub links: Vec<Link>,

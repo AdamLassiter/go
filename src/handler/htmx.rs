@@ -11,9 +11,9 @@ use axum::{
 
 use crate::{
     AppState,
-    schema::{CreateLink, DeleteLink, FilterOptions, GetLink, UpdateLink},
+    schema::{CreateLink, DeleteLink, FilterOptions, GetLink, UpdateLink, ViewOptions},
     service::{create_link, delete_link, edit_link, get_link, get_links},
-    template::{ErrorTemplate, LinksTemplate, ListTemplate, ViewTemplate},
+    template::{EditTemplate, ErrorTemplate, LinksTemplate, ListTemplate, ViewTemplate},
 };
 
 fn db_err(err: sqlx::Error) -> (StatusCode, Html<String>) {
@@ -78,12 +78,18 @@ async fn edit_link_handler(
 async fn get_link_handler(
     State(app_state): State<Arc<AppState>>,
     Path(id): Path<i64>,
+    opts: Query<ViewOptions>,
 ) -> Result<impl IntoResponse, (StatusCode, Html<String>)> {
     let link = get_link(&app_state, &GetLink { id })
         .await
         .map_err(db_err)?;
 
-    let template_response = ViewTemplate { link }.render().map_err(tp_err)?;
+    let template_response = if opts.editable {
+        EditTemplate { link }.render()
+    } else {
+        ViewTemplate { link }.render()
+    }
+    .map_err(tp_err)?;
 
     Ok(Html(template_response))
 }
@@ -101,15 +107,12 @@ async fn delete_link_handler(
 
 pub fn router(app_state: Arc<AppState>) -> Router {
     Router::new()
-        .route(
-            "/links",
-            get(get_links_handler)
-                .post(create_link_handler)
-                .put(edit_link_handler),
-        )
+        .route("/links", get(get_links_handler).post(create_link_handler))
         .route(
             "/links/{id}",
-            get(get_link_handler).delete(delete_link_handler),
+            get(get_link_handler)
+                .delete(delete_link_handler)
+                .put(edit_link_handler),
         )
         .with_state(app_state)
 }
