@@ -1,27 +1,28 @@
-<div id="link-{{ link.id }}" class="row gx-1 py-1">
-    <div id="link-{{ link.id }}-card" class="card">
-        <div class="card-body d-flex flex-row">
-            <div id="link-{{ link.id }}-source" class="col-2 p-1">
-                <h4>{{ link.source }}</h4>
+<div id="link-{{ link.id }}" class="row py-1">
+    <div id="link-{{ link.id }}-card" class="card p-0">
+        <div class="card-body d-flex flex-row p-1">
+            <div id="link-{{ link.id }}-source" class="col-2 p-1 my-auto">
+                <span>{{ link.source }}</span>
             </div>
-            <div id="link-{{ link.id }}-target" class="p-1 flex-grow-1">
-                <h4>{{ link.target }}</h4>
+            <div id="link-{{ link.id }}-target" class="p-1 flex-grow-1 my-auto">
+                <span>{{ link.target }}</span>
             </div>
             <div class="p-1">
-                <a id="link-{{ link.id }}-go" href="{{ link.target }}" class="btn btn-primary">
+                <a id="link-{{ link.id }}-go" href="{{ link.target }}" class="btn btn-sm btn-primary text-nowrap">
                     🌐 Go!
                 </a>
             </div>
             <div class="p-1">
-                <button id="link-{{ link.id }}-edit" class="btn btn-success"
+                <button id="link-{{ link.id }}-edit" class="btn btn-sm btn-success text-nowrap"
                     hx-get="/go/links/{{link.id}}?editable=true" hx-trigger="click" hx-target="#link-{{ link.id }}"
                     hx-swap="outerHTML">
                     ✏ Edit
                 </button>
             </div>
             <div class="p-1">
-                <button id="link-{{ link.id }}-delete" class="btn btn-danger" hx-delete="/go/links/{{link.id}}"
-                    hx-trigger="click" hx-target="#link-{{ link.id }}-card" hx-swap="delete">
+                <button id="link-{{ link.id }}-delete" class="btn btn-sm btn-danger text-nowrap"
+                    hx-delete="/go/links/{{link.id}}" hx-trigger="click" hx-target="#link-{{ link.id }}-card"
+                    hx-swap="delete">
                     🗑 Delete
                 </button>
             </div>

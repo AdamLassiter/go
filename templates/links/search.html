@@ -1,5 +1,5 @@
-<form id="add-form" class="d-flex flex-row flex-grow-1">
-    <div class="d-flex flex-row flex-grow-1">
+<div class="d-flex flex-row flex-grow-1">
+    <form id="add-form" class="d-flex flex-row flex-grow-1">
         <div class="p-1 d-flex flex-col">
             <div class="input-group my-auto">
                 <span class="input-group-text" id="source-input-search-label">Alias</span>
@@ -14,25 +14,24 @@
                 <label for="is-alias-switch" class="form-check-label">Alias?</label>
             </div>
         </div>
-        <div class="p-1 d-flex flex-col">
+        <div class="p-1 d-flex flex-col flex-grow-1">
             <div class="input-group my-auto">
                 <span class="input-group-text" id="target-input-search-label">URL</span>
-                <input id="target-input-search" class="form-control" placeholder="Target URL" required type="url"
-                    name="target" aria-describedby="target-input-search-label">
+                <input id="target-input-search" class="form-control flex-grow-1" placeholder="Target URL" required
+                    type="url" name="target" aria-describedby="target-input-search-label">
             </div>
         </div>
-        <div class="d-flex flex-row flex-grow-1"></div>
         <div class="p-1">
-            <button class="btn btn-primary form-control" hx-post="/go/links" hx-trigger="click"
+            <button class="btn btn-primary form-control text-nowrap" hx-post="/go/links" hx-trigger="click"
                 hx-target="#links-content" hx-swap="beforeend">
                 🔎 Search
             </button>
         </div>
         <div class="p-1">
-            <button class="btn btn-success form-control" hx-post="/go/links" hx-trigger="click"
-                hx-target="#links-content" hx-swap="beforeend">
+            <button class="btn btn-success form-control text-nowrap" hx-post="/go/links" hx-trigger="click"
+                hx-target="#links-content" hx-swap="beforebegin">
                 + Add
             </button>
         </div>
-    </div>
-</form>
+    </form>
+</div>

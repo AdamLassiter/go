@@ -24,9 +24,11 @@ impl FilterOptions {
     pub fn as_query(&self) -> QueryAs<'_, Sqlite, Link, SqliteArguments<'_>> {
         let offset = (self.page - 1) * self.limit;
 
-        sqlx::query_as::<_, Link>(r#"select * from links order by id limit ? offset ?"#)
-            .bind(self.limit as i32)
-            .bind(offset as i32)
+        sqlx::query_as::<_, Link>(
+            r#"select * from links order by modified_at desc limit ? offset ?"#,
+        )
+        .bind(self.limit as i32)
+        .bind(offset as i32)
     }
 
     pub fn as_count(&self) -> QueryScalar<'_, Sqlite, i64, SqliteArguments<'_>> {

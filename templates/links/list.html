@@ -1,17 +1,4 @@
 <div id="links" class="col">
-    <div id="links-header" class="col py-1">
-        <div class="d-flex flex-row">
-            <h3 class="p-1 col-2">
-                Alias
-            </h3>
-            <h3 class="p-1 flex-grow-1">
-                Target
-            </h3>
-            <h3 class="p-1">
-                Actions
-            </h3>
-        </div>
-    </div>
     <div id="links-content" class="col">
         {% for link in links %}
         {%- include "links/view.html" -%}

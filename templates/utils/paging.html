@@ -6,15 +6,17 @@
         </li>
         {% for n in 1..paging.page %}
         <li class="page-item">
-            <a class="page-link" hx-get="{{ paging.target }}?page={{ n }}&limit={{ paging.limit }}">{{ n }}</a>
+            <a class="page-link" hx-get="{{ paging.source }}?page={{ n }}&limit={{ paging.limit }}"
+                hx-target="{{ paging.target }}">{{ n }}</a>
         </li>
         {% endfor %}
         <li class="page-item active">
             <a class="page-link">{{ paging.page }}</a>
         </li>
-        {% for n in paging.page+1..paging.last %}
+        {% for n in paging.page+1..paging.last+1 %}
         <li class="page-item">
-            <a class="page-link" hx-get="{{ paging.target }}?page={{ n }}&limit={{ paging.limit }}">{{ n }}</a>
+            <a class="page-link" hx-get="{{ paging.source }}?page={{ n }}&limit={{ paging.limit }}"
+                hx-target="{{ paging.target }}">{{ n }}</a>
         </li>
         {% endfor %}
         <li class="page-item {% if paging.page >= paging.last %}disabled{% endif %}">
