@@ -11,11 +11,15 @@
                 <a id="link-{{ link.id }}-go" href="{{ link.target }}" class="btn btn-primary">
                     🌐 Go!
                 </a>
+            </div>
+            <div class="p-1">
                 <button id="link-{{ link.id }}-edit" class="btn btn-success"
                     hx-get="/go/links/{{link.id}}?editable=true" hx-trigger="click" hx-target="#link-{{ link.id }}"
                     hx-swap="outerHTML">
                     ✏ Edit
                 </button>
+            </div>
+            <div class="p-1">
                 <button id="link-{{ link.id }}-delete" class="btn btn-danger" hx-delete="/go/links/{{link.id}}"
                     hx-trigger="click" hx-target="#link-{{ link.id }}-card" hx-swap="delete">
                     🗑 Delete

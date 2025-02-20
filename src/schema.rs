@@ -112,11 +112,11 @@ pub struct UpdateLink {
 impl UpdateLink {
     pub fn as_query(&self, id: i64) -> QueryAs<'_, Sqlite, Link, SqliteArguments<'_>> {
         sqlx::query_as(
-            r#"update links where id = ? set source = ?, is_alias = ?, target = ? returning *"#,
+            r#"update links set source = ?, is_alias = ?, target = ? where id = ? returning *"#,
         )
-        .bind(id)
         .bind(&self.source)
         .bind(self.is_alias)
         .bind(&self.target)
+        .bind(id)
     }
 }
