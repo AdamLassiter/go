@@ -11,7 +11,9 @@ use axum::{
 
 use crate::{
     AppState,
-    schema::{CreateLink, DeleteLink, FilterOptions, GetLink, UpdateLink, ViewOptions},
+    schema::{
+        CreateLink, DeleteLink, FilterOptions, GetAllLinks, GetLink, UpdateLink, ViewOptions,
+    },
     service::{create_link, delete_link, edit_link, get_link, get_links},
     template::{EditTemplate, ErrorTemplate, LinksTemplate, ListTemplate, ViewTemplate},
 };
@@ -40,10 +42,11 @@ pub async fn index_handler() -> Result<impl IntoResponse, (StatusCode, Html<Stri
 
 async fn get_links_handler(
     State(app_state): State<Arc<AppState>>,
-    opts: Query<FilterOptions>,
+    Query(filter): Query<FilterOptions>,
 ) -> Result<impl IntoResponse, (StatusCode, Html<String>)> {
-    let (links, last) = get_links(&app_state, &opts).await.map_err(db_err)?;
-    let paging = opts.into_paging(last, "/go/links", "#links");
+    let get_all = GetAllLinks { filter };
+    let (links, last) = get_links(&app_state, &get_all).await.map_err(db_err)?;
+    let paging = filter.into_paging(last, "/go/links", "#links");
 
     let template_response = ListTemplate { links, paging }.render().map_err(tp_err)?;
 
@@ -78,13 +81,13 @@ async fn edit_link_handler(
 async fn get_link_handler(
     State(app_state): State<Arc<AppState>>,
     Path(id): Path<i64>,
-    opts: Query<ViewOptions>,
+    view: Query<ViewOptions>,
 ) -> Result<impl IntoResponse, (StatusCode, Html<String>)> {
     let link = get_link(&app_state, &GetLink { id })
         .await
         .map_err(db_err)?;
 
-    let template_response = if opts.editable {
+    let template_response = if view.editable {
         EditTemplate { link }.render()
     } else {
         ViewTemplate { link }.render()

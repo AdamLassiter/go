@@ -42,10 +42,16 @@ sqlx migrate revert
 
 While SQLx _can_ provide compile-time checks of SQL queries, this feature is only available through the provided macros; these suffer some ergonomic downsides which the gains do not justify.
 
+
 ### SQLite
 See [schema.rs](src/schema.rs)
 
-Go! specifically uses [SQLite](https://www.sqlite.org/docs.html) as the SQL database engine of choice - it's quick enough, runs locally to minimise required infrastructure, and allows backups to be as trivial as a single file copy.
+Go! uses [SQLite](https://www.sqlite.org/docs.html) as the SQL database engine of choice - it's quick enough, runs locally to minimise required infrastructure, and allows backups to be as trivial as a single file copy.
+
+#### SQLite Extensions
+Go also leverages the following following 
+
+
 
 ### Askama
 See [template.rs](src/template.rs) and [templates](templates)
@@ -78,6 +84,7 @@ pub struct PagedLinksTemplate {
 
 Askama provides type-checking of templates at compile-time.
 
+
 ### HTMX
 See [templates](templates) and [route.rs](src/route.rs)
 
@@ -85,8 +92,8 @@ Go! adds interactivity to frontend pages using [HTMX](https://htmx.org/docs/).
 
 This is generally achieved through HTTP <verb> requests which recieve HTML fragment responses, which are swapped in and out of the DOM.
 
-### Bootstrap
 
+### Bootstrap
 Go! uses [Bootstrap](https://getbootstrap.com/docs/5.3/getting-started/introduction/) as a component library and UI toolkit, allowing components to be styled easily and consistently without resorting to CSS fragments.
 
 Bootstrap provides a vast array of CSS classes that can be combined to achieve most common web-app usecases, e.g. a radio button group with:
@@ -102,6 +109,7 @@ Bootstrap provides a vast array of CSS classes that can be combined to achieve m
   <label class="btn btn-outline-danger" for="btnradio3">Radio 3</label>
 </div>
 ```
+
 
 # Some Ideas
 

@@ -12,8 +12,11 @@ use sqlx::Error;
 
 use crate::{
     AppState,
-    schema::{CreateLink, DeleteLink, FilterOptions, GetLink, UpdateLink},
-    service::{create_link, delete_link, edit_link, get_link, get_links},
+    schema::{
+        CreateLink, DeleteLink, FilterOptions, FindLink, GetAllLinks, GetLink, SearchLink,
+        UpdateLink,
+    },
+    service::{create_link, delete_link, edit_link, find_link, get_link, get_links, search_links},
 };
 
 fn db_err(err: Error) -> (StatusCode, Json<Value>) {
@@ -77,12 +80,13 @@ async fn health_check_handler() -> impl IntoResponse {
 
 async fn get_links_handler(
     State(app_state): State<Arc<AppState>>,
-    opts: Query<FilterOptions>,
+    Query(filter): Query<FilterOptions>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<Value>)> {
-    let (links, last) = get_links(&app_state, &opts).await.map_err(db_err)?;
+    let get_all = GetAllLinks { filter };
+    let (links, last) = get_links(&app_state, &get_all).await.map_err(db_err)?;
 
     let json_response = json!({
-        "paging": opts.into_paging(last, "/api/links", ""),
+        "paging": filter.into_paging(last, "/api/links", ""),
         "links": links
     });
 
@@ -115,6 +119,35 @@ async fn get_link_handler(
     });
 
     Ok(Json(link_response))
+}
+
+async fn find_link_handler(
+    State(app_state): State<Arc<AppState>>,
+    Path(query): Path<String>,
+    Query(filter): Query<FilterOptions>,
+) -> Result<impl IntoResponse, (StatusCode, Json<Value>)> {
+    let link = find_link(&app_state, &FindLink {
+        query: query.clone(),
+    })
+    .await
+    .map_err(db_err)?;
+    if let Some(link) = link {
+        let link_response = json!({
+            "link": link,
+        });
+
+        Ok(Json(link_response))
+    } else {
+        let links = search_links(&app_state, &SearchLink { query, filter })
+            .await
+            .map_err(db_err)?;
+
+        let links_response = json!({
+            "links": links,
+        });
+
+        Ok(Json(links_response))
+    }
 }
 
 async fn edit_link_handler(
@@ -154,5 +187,6 @@ pub fn router(app_state: Arc<AppState>) -> Router {
                 .put(edit_link_handler)
                 .delete(delete_link_handler),
         )
+        .route("/search/{alias}", get(find_link_handler))
         .with_state(app_state)
 }

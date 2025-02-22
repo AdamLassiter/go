@@ -7,35 +7,21 @@ use sqlx::{
     sqlite::SqliteArguments,
 };
 
-fn default_page() -> usize {
+fn default_page() -> u64 {
     1
 }
-fn default_limit() -> usize {
+fn default_limit() -> u64 {
     10
 }
-#[derive(Deserialize, Debug, Default, Clone, Copy)]
+#[derive(Deserialize, Serialize, Debug, Default, Clone, Copy)]
 pub struct FilterOptions {
     #[serde(default = "default_page")]
-    pub page: usize,
+    pub page: u64,
     #[serde(default = "default_limit")]
-    pub limit: usize,
+    pub limit: u64,
 }
 impl FilterOptions {
-    pub fn as_query(&self) -> QueryAs<'_, Sqlite, Link, SqliteArguments<'_>> {
-        let offset = (self.page - 1) * self.limit;
-
-        sqlx::query_as::<_, Link>(
-            r#"select * from links order by modified_at desc limit ? offset ?"#,
-        )
-        .bind(self.limit as i32)
-        .bind(offset as i32)
-    }
-
-    pub fn as_count(&self) -> QueryScalar<'_, Sqlite, i64, SqliteArguments<'_>> {
-        sqlx::query_scalar(r#"select count(*) from links"#)
-    }
-
-    pub fn into_paging(self, last: usize, source: &str, target: &str) -> Paging {
+    pub fn into_paging(self, last: u64, source: &str, target: &str) -> Paging {
         let page = self.page;
         let limit = self.limit;
         Paging {
@@ -45,6 +31,27 @@ impl FilterOptions {
             source: source.to_string(),
             target: target.to_string(),
         }
+    }
+    pub fn offset(&self) -> u64 {
+        (self.page - 1) * self.limit
+    }
+}
+
+#[derive(Deserialize, Debug, Default, Clone, Copy)]
+pub struct GetAllLinks {
+    pub filter: FilterOptions,
+}
+impl GetAllLinks {
+    pub fn as_query(&self) -> QueryAs<'_, Sqlite, Link, SqliteArguments<'_>> {
+        sqlx::query_as::<_, Link>(
+            r#"select * from links order by modified_at desc limit ? offset ?"#,
+        )
+        .bind(self.filter.limit as i64)
+        .bind(self.filter.offset() as i64)
+    }
+
+    pub fn as_count(&self) -> QueryScalar<'_, Sqlite, i64, SqliteArguments<'_>> {
+        sqlx::query_scalar(r#"select count(*) from links"#)
     }
 }
 
@@ -78,11 +85,35 @@ impl DeleteLink {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct FindLink {
-    pub source: String,
+    pub query: String,
 }
 impl FindLink {
     pub fn as_query(&self) -> QueryAs<'_, Sqlite, Link, SqliteArguments<'_>> {
-        sqlx::query_as::<_, Link>(r#"select * from links where source = ?"#).bind(&self.source)
+        sqlx::query_as::<_, Link>(r#"select * from links where source = ?"#).bind(&self.query)
+    }
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct SearchLink {
+    pub query: String,
+    pub filter: FilterOptions,
+}
+impl SearchLink {
+    pub fn as_query(&self) -> QueryAs<'_, Sqlite, Link, SqliteArguments<'_>> {
+        sqlx::query_as::<_, Link>(
+            r#"
+        .param set :query ?
+        with matches as ((
+            select id, distance from vec_links
+            where vec_alias match lembed('minilm', :query)
+            union
+            select id, distance from vec_links
+            where vec_description match lembed('minilm', :query)
+        ) order by distance limit )
+        select * from matches where source = ?
+        "#,
+        )
+        .bind(&self.query)
     }
 }
 

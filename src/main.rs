@@ -30,10 +30,14 @@ async fn main() -> Result<(), sqlx::Error> {
 
     let options = SqliteConnectOptions::new()
         .filename(env::var("DATABASE_FILENAME").expect("DATABASE_FILENAME not set"))
+        .extension("extensions/vec0")
+        .extension("extensions/lembed0")
         .create_if_missing(true);
 
     // let pool = sqlx::sqlite::SqlitePool::connect("sqlite:go.db").await?;
     let db = SqlitePool::connect_with(options).await?;
+
+    println!("🔄 Running migrations...");
     sqlx::migrate!().run(&db).await?;
 
     let cors = CorsLayer::new()

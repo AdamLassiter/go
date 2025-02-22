@@ -3,15 +3,27 @@ use sqlx::Error;
 use crate::{
     AppState,
     model::Link,
-    schema::{CreateLink, DeleteLink, FilterOptions, FindLink, GetLink, UpdateLink},
+    schema::{
+        CreateLink, DeleteLink, FindLink, GetAllLinks, GetLink, SearchLink,
+        UpdateLink,
+    },
 };
 
-pub async fn get_links(app_state: &AppState, opts: &FilterOptions) -> Result<(Vec<Link>, usize), Error> {
-    let links = opts.as_query().fetch_all(&app_state.db).await?;
-    let count = opts.as_count().fetch_one(&app_state.db).await?;
-    let last = (count as usize).div_ceil(opts.limit);
+pub async fn get_links(
+    app_state: &AppState,
+    get_all: &GetAllLinks,
+) -> Result<(Vec<Link>, u64), Error> {
+    let links = get_all.as_query().fetch_all(&app_state.db).await?;
+    let count = get_all.as_count().fetch_one(&app_state.db).await?;
+    let last = (count as u64).div_ceil(get_all.filter.limit);
 
     Ok((links, last))
+}
+
+pub async fn search_links(app_state: &AppState, search: &SearchLink) -> Result<Vec<Link>, Error> {
+    let link = search.as_query().fetch_all(&app_state.db).await?;
+
+    Ok(link)
 }
 
 pub async fn create_link(app_state: &AppState, create: &CreateLink) -> Result<Link, Error> {
@@ -20,8 +32,8 @@ pub async fn create_link(app_state: &AppState, create: &CreateLink) -> Result<Li
     Ok(link)
 }
 
-pub async fn find_link(app_state: &AppState, find: &FindLink) -> Result<Link, Error> {
-    let link = find.as_query().fetch_one(&app_state.db).await?;
+pub async fn find_link(app_state: &AppState, find: &FindLink) -> Result<Option<Link>, Error> {
+    let link = find.as_query().fetch_optional(&app_state.db).await?;
 
     Ok(link)
 }
