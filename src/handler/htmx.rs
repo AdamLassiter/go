@@ -12,8 +12,8 @@ use axum::{
 use crate::{
     AppState,
     schema::{
-        CreateLink, DeleteLink, FilterOptions, GetAllLinks, GetLink, SearchLink, SearchOptions,
-        UpdateLink, ViewOptions,
+        CreateLink, DeleteLink, FilterOptions, GetAllLinks, GetLink, SearchLinks, SearchMethod,
+        SearchOptions, UpdateLink, ViewOptions,
     },
     service::{create_link, delete_link, edit_link, get_link, get_links, search_links},
     template::{EditTemplate, ErrorTemplate, LinksTemplate, ListTemplate, ViewTemplate},
@@ -44,16 +44,32 @@ pub async fn index_handler() -> Result<impl IntoResponse, (StatusCode, Html<Stri
 async fn get_links_handler(
     State(app_state): State<Arc<AppState>>,
     Query(filter): Query<FilterOptions>,
-    Query(search): Query<SearchOptions>,
 ) -> Result<impl IntoResponse, (StatusCode, Html<String>)> {
-    let (links, last) = if !search.query.is_empty() {
-        let search = SearchLink { filter, search };
-        search_links(&app_state, &search).await.map_err(db_err)?
-    } else {
-        let get_all = GetAllLinks { filter };
-        get_links(&app_state, &get_all).await.map_err(db_err)?
-    };
+    let get_all = GetAllLinks { filter };
+    let (links, last) = get_links(&app_state, &get_all).await.map_err(db_err)?;
     let paging = filter.into_paging(last, "/go/links", "#links");
+
+    let template_response = ListTemplate { links, paging }.render().map_err(tp_err)?;
+
+    Ok(Html(template_response))
+}
+
+async fn search_links_handler(
+    State(app_state): State<Arc<AppState>>,
+    Path((method, query)): Path<(String, String)>,
+    Query(filter): Query<FilterOptions>,
+) -> Result<impl IntoResponse, (StatusCode, Html<String>)> {
+    let path = format!("/go/links/{}/{}", method.as_str(), query);
+    let method = SearchMethod::try_from_str(&method).ok_or((
+        StatusCode::NOT_FOUND,
+        Html(ErrorTemplate {}.render().map_err(tp_err)?),
+    ))?;
+    let search = SearchLinks {
+        filter,
+        search: SearchOptions { query, method },
+    };
+    let (links, last) = search_links(&app_state, &search).await.map_err(db_err)?;
+    let paging = filter.into_paging(last, &path, "#links");
 
     let template_response = ListTemplate { links, paging }.render().map_err(tp_err)?;
 
@@ -117,9 +133,10 @@ async fn delete_link_handler(
 
 pub fn router(app_state: Arc<AppState>) -> Router {
     Router::new()
+        .route("/links/{method}/{query}", get(search_links_handler))
         .route("/links", get(get_links_handler).post(create_link_handler))
         .route(
-            "/links/{id}",
+            "/link/{id}",
             get(get_link_handler)
                 .delete(delete_link_handler)
                 .put(edit_link_handler),

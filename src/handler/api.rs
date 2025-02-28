@@ -13,7 +13,7 @@ use sqlx::Error;
 use crate::{
     AppState,
     schema::{
-        CreateLink, DeleteLink, FilterOptions, FindLink, GetAllLinks, GetLink, SearchLink,
+        CreateLink, DeleteLink, FilterOptions, FindLink, GetAllLinks, GetLink, SearchLinks,
         SearchOptions, UpdateLink,
     },
     service::{create_link, delete_link, edit_link, find_link, get_link, get_links, search_links},
@@ -138,7 +138,7 @@ async fn find_link_handler(
 
         Ok(Json(link_response))
     } else {
-        let links = search_links(&app_state, &SearchLink { filter, search })
+        let links = search_links(&app_state, &SearchLinks { filter, search })
             .await
             .map_err(db_err)?;
 

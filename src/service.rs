@@ -3,14 +3,14 @@ use sqlx::Error;
 use crate::{
     AppState,
     model::Link,
-    schema::{CreateLink, DeleteLink, FindLink, GetAllLinks, GetLink, SearchLink, UpdateLink},
+    schema::{CreateLink, DeleteLink, FindLink, GetAllLinks, GetLink, SearchLinks, UpdateLink},
 };
 
 pub async fn get_links(
     app_state: &AppState,
     get_all: &GetAllLinks,
 ) -> Result<(Vec<Link>, u64), Error> {
-    println!("💽 Search for everything");
+    println!("💽 Get everything");
     let links = get_all.as_query().fetch_all(&app_state.db).await?;
     let count = get_all.as_count().fetch_one(&app_state.db).await?;
     let last = (count as u64).div_ceil(get_all.filter.limit);
@@ -20,9 +20,9 @@ pub async fn get_links(
 
 pub async fn search_links(
     app_state: &AppState,
-    search: &SearchLink,
+    search: &SearchLinks,
 ) -> Result<(Vec<Link>, u64), Error> {
-    println!("💽 Search for '{}'", search.search.query);
+    println!("💽 Search for '{}' with strategy '{}'", search.search.query, search.search.method.as_str());
     let links = search.as_query().fetch_all(&app_state.db).await?;
     let count = search.as_count().fetch_one(&app_state.db).await?;
     let last = (count as u64).div_ceil(search.filter.limit);

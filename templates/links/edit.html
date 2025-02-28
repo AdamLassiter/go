@@ -25,13 +25,13 @@
                     </div>
                 </div>
                 <div class="p-1">
-                    <button class="btn btn-sm btn-secondary form-control text-nowrap" hx-get="/go/links/{{ link.id }}"
+                    <button class="btn btn-sm btn-secondary form-control text-nowrap" hx-get="/go/link/{{ link.id }}"
                         hx-trigger="click" hx-target="#link-{{ link.id }}" hx-swap="outerHTML">
                         🗙 Cancel
                     </button>
                 </div>
                 <div class="p-1">
-                    <button class="btn btn-sm btn-primary form-control text-nowrap" hx-put="/go/links/{{ link.id }}"
+                    <button class="btn btn-sm btn-primary form-control text-nowrap" hx-put="/go/link/{{ link.id }}"
                         hx-trigger="click" hx-target="#link-{{ link.id }}" hx-swap="outerHTML">
                         💾 Save
                     </button>

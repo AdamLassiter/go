@@ -42,6 +42,27 @@ pub enum SearchMethod {
     DamerauLevenshtein,
     Levenshtein,
 }
+impl SearchMethod {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::Semantic => "semantic",
+            Self::Metaphone => "metaphone",
+            Self::Soundex => "soundex",
+            Self::DamerauLevenshtein => "damerau",
+            Self::Levenshtein => "levenshtein",
+        }
+    }
+    pub fn try_from_str(string: &str) -> Option<Self> {
+        match string {
+            "semantic" => Some(Self::Semantic),
+            "metaphone" => Some(Self::Metaphone),
+            "soundex" => Some(Self::Soundex),
+            "damerau" => Some(Self::DamerauLevenshtein),
+            "levenshtein" => Some(Self::Levenshtein),
+            _ => None
+        }
+    }
+}
 
 #[derive(Deserialize, Serialize, Debug, Default, Clone)]
 pub struct SearchOptions {
@@ -80,7 +101,7 @@ pub struct FindLink {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct SearchLink {
+pub struct SearchLinks {
     pub filter: FilterOptions,
     pub search: SearchOptions,
 }

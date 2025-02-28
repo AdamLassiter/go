@@ -16,7 +16,8 @@ use dotenv::dotenv;
 use tokio::net::TcpListener;
 
 use sqlx::{
-    Executor, SqlitePool,
+    Error, Executor, Pool, Sqlite, SqlitePool,
+    migrate::MigrateError,
     sqlite::{SqliteConnectOptions, SqlitePoolOptions},
 };
 
@@ -28,34 +29,11 @@ pub struct AppState {
 }
 
 #[tokio::main]
-async fn main() -> Result<(), sqlx::Error> {
+async fn main() -> Result<(), Error> {
     dotenv().ok();
     println!("🔎 Go! Crowdsourced Search Service");
 
-    let conn_opts = SqliteConnectOptions::new()
-        .filename(env::var("DATABASE_FILENAME").expect("DATABASE_FILENAME not set"))
-        .extension("extensions/vec0")
-        .extension("extensions/lembed0")
-        .extension("extensions/damerau_levenshtein0")
-        .extension("extensions/levenshtein0")
-        .extension("extensions/metaphone0")
-        .extension("extensions/soundex0")
-        .create_if_missing(true);
-    let pool_opts = SqlitePoolOptions::new().after_connect(|conn, _meta| {
-        Box::pin(async move {
-            conn.execute(
-                r#"insert into temp.lembed_models (name, model)
-                select 'default', lembed_model_from_file('models/all-MiniLM-L6-v2.q8_0.gguf');"#,
-            )
-            .await?;
-            Ok(())
-        })
-    });
-
-    let db = pool_opts.connect_with(conn_opts).await?;
-
-    println!("🔄 Running migrations...");
-    sqlx::migrate!("./migrations").run(&db).await?;
+    let db = init_db().await?;
 
     let cors = CorsLayer::new()
         .allow_methods([Method::GET, Method::POST, Method::DELETE, Method::PUT])
@@ -72,4 +50,39 @@ async fn main() -> Result<(), sqlx::Error> {
         .unwrap();
 
     Ok(())
+}
+
+async fn init_db() -> Result<Pool<Sqlite>, Error> {
+    let conn_opts = SqliteConnectOptions::new()
+        .filename(env::var("DATABASE_FILENAME").expect("DATABASE_FILENAME not set"))
+        .extension("extensions/vec0")
+        .extension("extensions/lembed0")
+        .extension("extensions/damerau_levenshtein0")
+        .extension("extensions/levenshtein0")
+        .extension("extensions/metaphone0")
+        .extension("extensions/soundex0")
+        .create_if_missing(true);
+
+    let pool_opts = SqlitePoolOptions::new().after_connect(|conn, _meta| {
+        Box::pin(async move {
+            println!("🔄 Running initialisations...");
+            let initialiser = sqlx::migrate!("./initialisations");
+            for migration in initialiser
+                .iter()
+                .filter(|&initialisation| initialisation.migration_type.is_up_migration())
+            {
+                conn.execute(&*migration.sql)
+                    .await
+                    .map_err(MigrateError::Execute)?;
+            }
+            Ok(())
+        })
+    });
+
+    let db = pool_opts.connect_with(conn_opts).await?;
+
+    println!("🔄 Running migrations...");
+    sqlx::migrate!("./migrations").run(&db).await?;
+
+    Ok(db)
 }

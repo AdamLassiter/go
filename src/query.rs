@@ -1,7 +1,7 @@
 use crate::{
     model::Link,
     schema::{
-        CreateLink, DeleteLink, FindLink, GetAllLinks, GetLink, SearchLink, SearchMethod,
+        CreateLink, DeleteLink, FindLink, GetAllLinks, GetLink, SearchLinks, SearchMethod,
         UpdateLink,
     },
 };
@@ -20,14 +20,14 @@ const SEMANTIC_H: &str = r#"
             from vec_links, queries
             where vec_source match lembed(query)
             and k = 100
-                union
-            select rowid, distance
-            from vec_links, queries
-            where vec_description match lembed(query)
-            and k = 100
+            --     union
+            -- select rowid, distance
+            -- from vec_links, queries
+            -- where vec_description match lembed(query)
+            -- and k = 100
         )
     "#;
-impl SearchLink {
+impl SearchLinks {
     pub fn as_semantic_count(&self) -> QueryScalar<'_, Sqlite, i64, SqliteArguments<'_>> {
         sqlx::query_scalar::<_, i64>(formatcp!(
             r#"{SEMANTIC_H}
