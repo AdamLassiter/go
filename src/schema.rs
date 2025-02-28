@@ -1,11 +1,6 @@
-use crate::model::{Link, Paging};
+use crate::model::Paging;
 
 use serde::{Deserialize, Serialize};
-use sqlx::{
-    Sqlite,
-    query::{Query, QueryAs, QueryScalar},
-    sqlite::SqliteArguments,
-};
 
 fn default_page() -> u64 {
     1
@@ -13,6 +8,7 @@ fn default_page() -> u64 {
 fn default_limit() -> u64 {
     10
 }
+
 #[derive(Deserialize, Serialize, Debug, Default, Clone, Copy)]
 pub struct FilterOptions {
     #[serde(default = "default_page")]
@@ -37,22 +33,27 @@ impl FilterOptions {
     }
 }
 
+#[derive(Deserialize, Serialize, Debug, Default, Clone, Copy)]
+pub enum SearchMethod {
+    #[default]
+    Semantic,
+    Metaphone,
+    Soundex,
+    DamerauLevenshtein,
+    Levenshtein,
+}
+
+#[derive(Deserialize, Serialize, Debug, Default, Clone)]
+pub struct SearchOptions {
+    #[serde(default)]
+    pub query: String,
+    #[serde(default)]
+    pub method: SearchMethod,
+}
+
 #[derive(Deserialize, Debug, Default, Clone, Copy)]
 pub struct GetAllLinks {
     pub filter: FilterOptions,
-}
-impl GetAllLinks {
-    pub fn as_query(&self) -> QueryAs<'_, Sqlite, Link, SqliteArguments<'_>> {
-        sqlx::query_as::<_, Link>(
-            r#"select * from links order by modified_at desc limit ? offset ?"#,
-        )
-        .bind(self.filter.limit as i64)
-        .bind(self.filter.offset() as i64)
-    }
-
-    pub fn as_count(&self) -> QueryScalar<'_, Sqlite, i64, SqliteArguments<'_>> {
-        sqlx::query_scalar(r#"select count(*) from links"#)
-    }
 }
 
 fn default_editable() -> bool {
@@ -68,53 +69,20 @@ pub struct ViewOptions {
 pub struct GetLink {
     pub id: i64,
 }
-impl GetLink {
-    pub fn as_query(&self) -> QueryAs<'_, Sqlite, Link, SqliteArguments<'_>> {
-        sqlx::query_as::<_, Link>(r#"select * from links where id = ?"#).bind(self.id)
-    }
-}
 
 pub struct DeleteLink {
     pub id: i64,
 }
-impl DeleteLink {
-    pub fn as_query(&self) -> Query<'_, Sqlite, SqliteArguments<'_>> {
-        sqlx::query(r#"delete from links where id = ?"#).bind(self.id)
-    }
-}
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct FindLink {
-    pub query: String,
-}
-impl FindLink {
-    pub fn as_query(&self) -> QueryAs<'_, Sqlite, Link, SqliteArguments<'_>> {
-        sqlx::query_as::<_, Link>(r#"select * from links where source = ?"#).bind(&self.query)
-    }
+    pub source: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct SearchLink {
-    pub query: String,
     pub filter: FilterOptions,
-}
-impl SearchLink {
-    pub fn as_query(&self) -> QueryAs<'_, Sqlite, Link, SqliteArguments<'_>> {
-        sqlx::query_as::<_, Link>(
-            r#"
-        .param set :query ?
-        with matches as ((
-            select id, distance from vec_links
-            where vec_alias match lembed('minilm', :query)
-            union
-            select id, distance from vec_links
-            where vec_description match lembed('minilm', :query)
-        ) order by distance limit )
-        select * from matches where source = ?
-        "#,
-        )
-        .bind(&self.query)
-    }
+    pub search: SearchOptions,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -124,16 +92,6 @@ pub struct CreateLink {
     pub is_alias: bool,
     pub target: String,
 }
-impl CreateLink {
-    pub fn as_query(&self) -> QueryAs<'_, Sqlite, Link, SqliteArguments<'_>> {
-        sqlx::query_as::<_, Link>(
-            r#"insert into links (source, is_alias, target) values (?, ?, ?) returning *"#,
-        )
-        .bind(&self.source)
-        .bind(self.is_alias)
-        .bind(&self.target)
-    }
-}
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct UpdateLink {
@@ -141,15 +99,4 @@ pub struct UpdateLink {
     #[serde(default)]
     pub is_alias: bool,
     pub target: String,
-}
-impl UpdateLink {
-    pub fn as_query(&self, id: i64) -> QueryAs<'_, Sqlite, Link, SqliteArguments<'_>> {
-        sqlx::query_as(
-            r#"update links set source = ?, is_alias = ?, target = ? where id = ? returning *"#,
-        )
-        .bind(&self.source)
-        .bind(self.is_alias)
-        .bind(&self.target)
-        .bind(id)
-    }
 }

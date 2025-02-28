@@ -14,7 +14,7 @@ use crate::{
     AppState,
     schema::{
         CreateLink, DeleteLink, FilterOptions, FindLink, GetAllLinks, GetLink, SearchLink,
-        UpdateLink,
+        SearchOptions, UpdateLink,
     },
     service::{create_link, delete_link, edit_link, find_link, get_link, get_links, search_links},
 };
@@ -123,11 +123,11 @@ async fn get_link_handler(
 
 async fn find_link_handler(
     State(app_state): State<Arc<AppState>>,
-    Path(query): Path<String>,
     Query(filter): Query<FilterOptions>,
+    Query(search): Query<SearchOptions>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<Value>)> {
     let link = find_link(&app_state, &FindLink {
-        query: query.clone(),
+        source: search.query.clone(),
     })
     .await
     .map_err(db_err)?;
@@ -138,7 +138,7 @@ async fn find_link_handler(
 
         Ok(Json(link_response))
     } else {
-        let links = search_links(&app_state, &SearchLink { query, filter })
+        let links = search_links(&app_state, &SearchLink { filter, search })
             .await
             .map_err(db_err)?;
 

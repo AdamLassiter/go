@@ -12,9 +12,10 @@ use axum::{
 use crate::{
     AppState,
     schema::{
-        CreateLink, DeleteLink, FilterOptions, GetAllLinks, GetLink, UpdateLink, ViewOptions,
+        CreateLink, DeleteLink, FilterOptions, GetAllLinks, GetLink, SearchLink, SearchOptions,
+        UpdateLink, ViewOptions,
     },
-    service::{create_link, delete_link, edit_link, get_link, get_links},
+    service::{create_link, delete_link, edit_link, get_link, get_links, search_links},
     template::{EditTemplate, ErrorTemplate, LinksTemplate, ListTemplate, ViewTemplate},
 };
 
@@ -43,9 +44,15 @@ pub async fn index_handler() -> Result<impl IntoResponse, (StatusCode, Html<Stri
 async fn get_links_handler(
     State(app_state): State<Arc<AppState>>,
     Query(filter): Query<FilterOptions>,
+    Query(search): Query<SearchOptions>,
 ) -> Result<impl IntoResponse, (StatusCode, Html<String>)> {
-    let get_all = GetAllLinks { filter };
-    let (links, last) = get_links(&app_state, &get_all).await.map_err(db_err)?;
+    let (links, last) = if !search.query.is_empty() {
+        let search = SearchLink { filter, search };
+        search_links(&app_state, &search).await.map_err(db_err)?
+    } else {
+        let get_all = GetAllLinks { filter };
+        get_links(&app_state, &get_all).await.map_err(db_err)?
+    };
     let paging = filter.into_paging(last, "/go/links", "#links");
 
     let template_response = ListTemplate { links, paging }.render().map_err(tp_err)?;

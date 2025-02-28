@@ -4,5 +4,5 @@ create virtual table vec_links using vec0(
 );
 
 insert into vec_links (rowid, vec_source, vec_description)
-select id, lembed('minilm', source), lembed('minilm', description)
+select id, lembed(source), lembed(description)
 from links;

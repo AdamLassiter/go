@@ -2,6 +2,7 @@
 
 mod handler;
 mod model;
+mod query;
 mod route;
 mod schema;
 mod service;
@@ -14,7 +15,10 @@ use axum::http::{Method, header::CONTENT_TYPE};
 use dotenv::dotenv;
 use tokio::net::TcpListener;
 
-use sqlx::{SqlitePool, sqlite::SqliteConnectOptions};
+use sqlx::{
+    Executor, SqlitePool,
+    sqlite::{SqliteConnectOptions, SqlitePoolOptions},
+};
 
 use route::create_router;
 use tower_http::cors::{Any, CorsLayer};
@@ -28,17 +32,30 @@ async fn main() -> Result<(), sqlx::Error> {
     dotenv().ok();
     println!("🔎 Go! Crowdsourced Search Service");
 
-    let options = SqliteConnectOptions::new()
+    let conn_opts = SqliteConnectOptions::new()
         .filename(env::var("DATABASE_FILENAME").expect("DATABASE_FILENAME not set"))
         .extension("extensions/vec0")
         .extension("extensions/lembed0")
+        .extension("extensions/damerau_levenshtein0")
+        .extension("extensions/levenshtein0")
+        .extension("extensions/metaphone0")
+        .extension("extensions/soundex0")
         .create_if_missing(true);
+    let pool_opts = SqlitePoolOptions::new().after_connect(|conn, _meta| {
+        Box::pin(async move {
+            conn.execute(
+                r#"insert into temp.lembed_models (name, model)
+                select 'default', lembed_model_from_file('models/all-MiniLM-L6-v2.q8_0.gguf');"#,
+            )
+            .await?;
+            Ok(())
+        })
+    });
 
-    // let pool = sqlx::sqlite::SqlitePool::connect("sqlite:go.db").await?;
-    let db = SqlitePool::connect_with(options).await?;
+    let db = pool_opts.connect_with(conn_opts).await?;
 
     println!("🔄 Running migrations...");
-    sqlx::migrate!().run(&db).await?;
+    sqlx::migrate!("./migrations").run(&db).await?;
 
     let cors = CorsLayer::new()
         .allow_methods([Method::GET, Method::POST, Method::DELETE, Method::PUT])

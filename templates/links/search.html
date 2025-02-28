@@ -1,35 +1,20 @@
 <div class="d-flex flex-row flex-grow-1">
-    <form id="add-form" class="d-flex flex-row flex-grow-1">
-        <div class="p-1 d-flex flex-col">
-            <div class="input-group my-auto">
-                <span class="input-group-text" id="source-input-search-label">Alias</span>
-                <input class="form-control" placeholder="go <alias>" required type="text" name="source"
+    <form id="add-form" class="d-flex flex-row flex-grow-1" method="get">
+        <div class="p-1 flex-grow-1">
+            <div class="input-group my-auto flex-grow-1">
+                <input class="form-control flex-grow-1" placeholder="go <alias>" required type="text" name="query"
                     aria-describedby="source-input-search-label">
             </div>
         </div>
-        <div class="p-1 d-flex flex-col">
-            <div class="form-check form-switch my-auto">
-                <input id="is-alias-switch-search" class="form-check-input" required type="checkbox" value="false"
-                    onchange="syncSearchboxAndCheckbox('search')">
-                <label for="is-alias-switch" class="form-check-label">Alias?</label>
-            </div>
-        </div>
-        <div class="p-1 d-flex flex-col flex-grow-1">
-            <div class="input-group my-auto">
-                <span class="input-group-text" id="target-input-search-label">URL</span>
-                <input id="target-input-search" class="form-control flex-grow-1" placeholder="Target URL" required
-                    type="url" name="target" aria-describedby="target-input-search-label">
-            </div>
-        </div>
         <div class="p-1">
-            <button class="btn btn-primary form-control text-nowrap" hx-post="/go/links" hx-trigger="click"
-                hx-target="#links-content" hx-swap="beforeend">
+            <button class="btn btn-primary form-control text-nowrap" hx-get="/go/links" hx-trigger="click"
+                hx-target="#links-content" hx-swap="beforeend" hx-include="#add-form" hx-push-url="true">
                 🔎 Search
             </button>
         </div>
         <div class="p-1">
-            <button class="btn btn-success form-control text-nowrap" hx-post="/go/links" hx-trigger="click"
-                hx-target="#links-content" hx-swap="beforebegin">
+            <button class="btn btn-success form-control text-nowrap" hx-get="/go/links" hx-trigger="click"
+                hx-target="#navbar-content" hx-swap="beforeend">
                 + Add
             </button>
         </div>

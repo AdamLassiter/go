@@ -1,5 +1,6 @@
 insert into links (is_alias, target, source)
 values
+    (false, 'https://localhost:8080', 'go'),
     (false, 'https://google.com', 'google'),
     (false, 'https://bing.com', 'bing'),
     (false, 'https://duckduckgo.com', 'duckduckgo'),

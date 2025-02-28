@@ -39,6 +39,7 @@ sqlx migrate run
     <!> oh no <!>
 sqlx migrate revert
 ```
+However, using these migrations will require configuring SQLx to run with extensions.
 
 While SQLx _can_ provide compile-time checks of SQL queries, this feature is only available through the provided macros; these suffer some ergonomic downsides which the gains do not justify.
 
@@ -49,8 +50,12 @@ See [schema.rs](src/schema.rs)
 Go! uses [SQLite](https://www.sqlite.org/docs.html) as the SQL database engine of choice - it's quick enough, runs locally to minimise required infrastructure, and allows backups to be as trivial as a single file copy.
 
 #### SQLite Extensions
-Go also leverages the following following 
+Go also leverages the following extensions:
 
+* The [sqlite-vec](https://github.com/asg017/sqlite-vec) extension [vec0](extensions/vec0.so) allows for vector-search queries within SQLite.
+* The [sqlite-lembed](https://github.com/asg017/sqlite-lembed) extension [vec0](extensions/lembed0.so) allows for vector-embeddings within SQLite queries.
+
+These combnined allow
 
 
 ### Askama
