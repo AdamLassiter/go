@@ -14,7 +14,7 @@ use crate::{
     AppState,
     schema::{
         CreateLink, DeleteLink, FilterOptions, FindLink, GetAllLinks, GetLink, SearchLinks,
-        SearchOptions, UpdateLink,
+        SearchMethod, SearchOptions, UpdateLink,
     },
     service::{create_link, delete_link, edit_link, find_link, get_link, get_links, search_links},
 };
@@ -71,7 +71,6 @@ async fn health_check_handler() -> impl IntoResponse {
     const MESSAGE: &str = "GO API Services";
 
     let json_response = json!({
-        "status": "ok",
         "message": MESSAGE
     });
 
@@ -87,6 +86,31 @@ async fn get_links_handler(
 
     let json_response = json!({
         "paging": filter.into_paging(last, "/api/links", ""),
+        "links": links
+    });
+
+    Ok(Json(json_response))
+}
+
+async fn search_links_handler(
+    State(app_state): State<Arc<AppState>>,
+    Path((method, query)): Path<(String, String)>,
+    Query(filter): Query<FilterOptions>,
+) -> Result<impl IntoResponse, (StatusCode, Json<Value>)> {
+    let path = format!("/api/links/{}/{}", method.as_str(), query);
+    let method = SearchMethod::try_from_str(&method).ok_or((
+        StatusCode::NOT_FOUND,
+        Json(json!({"message": format!("Not found: {}", &method)})),
+    ))?;
+    let search = SearchLinks {
+        filter,
+        search: SearchOptions { query, method },
+    };
+    let (links, last) = search_links(&app_state, &search).await.map_err(db_err)?;
+    let paging = filter.into_paging(last, &path, "#links");
+
+    let json_response = json!({
+        "paging": paging,
         "links": links
     });
 
@@ -180,9 +204,10 @@ async fn delete_link_handler(
 pub fn router(app_state: Arc<AppState>) -> Router {
     Router::new()
         .route("/healthcheck", get(health_check_handler))
+        .route("/links/{method}/{query}", get(search_links_handler))
         .route("/links", get(get_links_handler).post(create_link_handler))
         .route(
-            "/links/{id}",
+            "/link/{id}",
             get(get_link_handler)
                 .put(edit_link_handler)
                 .delete(delete_link_handler),

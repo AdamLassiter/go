@@ -8,11 +8,13 @@ use crate::{
     handler::{
         api,
         htmx::{self, index_handler},
+        search,
     },
 };
 
 pub fn create_router(app_state: Arc<AppState>) -> Router {
     Router::new()
+        .nest_service("/search", search::router(app_state.clone()))
         .nest_service("/api", api::router(app_state.clone()))
         .nest_service("/go", htmx::router(app_state.clone()))
         .route("/", get(index_handler))
