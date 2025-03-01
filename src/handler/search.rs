@@ -37,7 +37,7 @@ async fn find_link_handler(
     if let Some(link) = link {
         Ok(Redirect::to(&link.target))
     } else {
-        let path = format!("/?query={}&method={}", search.query, search.method.as_str());
+        let path = format!("/?query={}&method={}", search.query, search.method);
         Ok(Redirect::to(&path))
     }
 }

@@ -3,29 +3,25 @@ use sqlx::Error;
 use crate::{
     AppState,
     model::Link,
-    schema::{CreateLink, DeleteLink, FindLink, GetAllLinks, GetLink, SearchLinks, UpdateLink},
+    schema::{CreateLink, DeleteLink, FindLink, GetLink, QueryLinks, UpdateLink},
 };
 
-pub async fn get_links(
+pub async fn query_links(
     app_state: &AppState,
-    get_all: &GetAllLinks,
+    query: &QueryLinks,
 ) -> Result<(Vec<Link>, u64), Error> {
-    println!("💽 Get everything");
-    let links = get_all.as_query().fetch_all(&app_state.db).await?;
-    let count = get_all.as_count().fetch_one(&app_state.db).await?;
-    let last = (count as u64).div_ceil(get_all.filter.limit);
-
-    Ok((links, last))
-}
-
-pub async fn search_links(
-    app_state: &AppState,
-    search: &SearchLinks,
-) -> Result<(Vec<Link>, u64), Error> {
-    println!("💽 Search for '{}' with strategy '{}'", search.search.query, search.search.method.as_str());
-    let links = search.as_query().fetch_all(&app_state.db).await?;
-    let count = search.as_count().fetch_one(&app_state.db).await?;
-    let last = (count as u64).div_ceil(search.filter.limit);
+    println!(
+        "💽 Search for '{}' with strategy '{}', page '{}' size '{}', sorted by '{}' '{}'",
+        query.search.query,
+        query.search.method,
+        query.paging.page,
+        query.paging.limit,
+        query.sort.sort_by,
+        query.sort.order
+    );
+    let links = query.as_query().fetch_all(&app_state.db).await?;
+    let count = query.as_count().fetch_one(&app_state.db).await?;
+    let last = (count as u64).div_ceil(query.paging.limit);
 
     Ok((links, last))
 }

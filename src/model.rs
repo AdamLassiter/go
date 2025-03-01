@@ -2,6 +2,8 @@ use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 
+use crate::schema::{PagingOptions, SearchOptions, SortOptions};
+
 #[derive(Debug, FromRow, Deserialize, Serialize)]
 pub struct Link {
     pub id: i64,
@@ -25,4 +27,28 @@ pub struct Paging {
 
     pub source: String,
     pub target: String,
+}
+impl Paging {
+    pub fn new(
+        paging: &PagingOptions,
+        search: &SearchOptions,
+        sort: &SortOptions,
+        last: u64,
+        source: &str,
+        target: &str,
+    ) -> Self {
+        let PagingOptions { page, limit } = *paging;
+        let source = format!(
+            "{source}?{}{}",
+            search.as_query(),
+            sort.as_query()
+        );
+        Self {
+            page,
+            limit,
+            last,
+            source,
+            target: target.to_string(),
+        }
+    }
 }

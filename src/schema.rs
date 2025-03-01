@@ -1,6 +1,46 @@
-use crate::model::Paging;
+use std::fmt::Display;
 
 use serde::{Deserialize, Serialize};
+
+#[derive(Deserialize, Serialize, Debug, Default, Clone, Copy)]
+pub enum SortMethod {
+    #[default]
+    Relevance,
+    Alphabetical,
+    Created,
+    Updated,
+}
+impl Display for SortMethod {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+#[derive(Deserialize, Serialize, Debug, Default, Clone, Copy)]
+pub enum SortOrder {
+    #[default]
+    Descending,
+    Ascending,
+}
+impl Display for SortOrder {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+#[derive(Deserialize, Serialize, Debug, Default, Clone, Copy)]
+pub struct SortOptions {
+    #[serde(default)]
+    pub sort_by: SortMethod,
+    #[serde(default)]
+    pub order: SortOrder,
+}
+impl SortOptions {
+    pub fn as_query(&self) -> String {
+        let Self { sort_by, order } = self;
+        let sort_by = sort_by.to_string();
+        let order = order.to_string();
+        format!("&sort_by={sort_by}&order={order}")
+    }
+}
 
 fn default_page() -> u64 {
     1
@@ -10,26 +50,19 @@ fn default_limit() -> u64 {
 }
 
 #[derive(Deserialize, Serialize, Debug, Default, Clone, Copy)]
-pub struct FilterOptions {
+pub struct PagingOptions {
     #[serde(default = "default_page")]
     pub page: u64,
     #[serde(default = "default_limit")]
     pub limit: u64,
 }
-impl FilterOptions {
-    pub fn into_paging(self, last: u64, source: &str, target: &str) -> Paging {
-        let page = self.page;
-        let limit = self.limit;
-        Paging {
-            page,
-            limit,
-            last,
-            source: source.to_string(),
-            target: target.to_string(),
-        }
-    }
+impl PagingOptions {
     pub fn offset(&self) -> u64 {
         (self.page - 1) * self.limit
+    }
+    pub fn as_query(&self) -> String {
+        let Self { page, limit } = self;
+        format!("&page={page}&limit={limit}")
     }
 }
 
@@ -42,25 +75,9 @@ pub enum SearchMethod {
     DamerauLevenshtein,
     Levenshtein,
 }
-impl SearchMethod {
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            Self::Semantic => "semantic",
-            Self::Metaphone => "metaphone",
-            Self::Soundex => "soundex",
-            Self::DamerauLevenshtein => "damerau",
-            Self::Levenshtein => "levenshtein",
-        }
-    }
-    pub fn try_from_str(string: &str) -> Option<Self> {
-        match string {
-            "semantic" => Some(Self::Semantic),
-            "metaphone" => Some(Self::Metaphone),
-            "soundex" => Some(Self::Soundex),
-            "damerau" => Some(Self::DamerauLevenshtein),
-            "levenshtein" => Some(Self::Levenshtein),
-            _ => None
-        }
+impl Display for SearchMethod {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
     }
 }
 
@@ -71,10 +88,12 @@ pub struct SearchOptions {
     #[serde(default)]
     pub method: SearchMethod,
 }
-
-#[derive(Deserialize, Debug, Default, Clone, Copy)]
-pub struct GetAllLinks {
-    pub filter: FilterOptions,
+impl SearchOptions {
+    pub fn as_query(&self) -> String {
+        let Self { query, method } = self;
+        let method = method.to_string();
+        format!("&query={query}&method={method}")
+    }
 }
 
 fn default_editable() -> bool {
@@ -101,9 +120,10 @@ pub struct FindLink {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct SearchLinks {
-    pub filter: FilterOptions,
+pub struct QueryLinks {
+    pub paging: PagingOptions,
     pub search: SearchOptions,
+    pub sort: SortOptions,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

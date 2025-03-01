@@ -1,23 +1,23 @@
 <div class="d-flex flex-row flex-grow-1">
-    <form id="add-form" class="d-flex flex-row flex-grow-1" method="get">
+    <form id="search-form" class="d-flex flex-row flex-grow-1" method="get">
         <div class="p-1 flex-grow-1">
             <div class="input-group my-auto flex-grow-1">
                 <input class="form-control flex-grow-1" placeholder="go <alias>" required type="text" name="query"
                     aria-describedby="source-input-search-label">
-                <input required type="hidden" name="method" value="semantic"/>
+                <input required type="hidden" name="method" value="Semantic" />
             </div>
         </div>
         <div class="p-1">
-            <button class="btn btn-primary form-control text-nowrap" hx-get="/go/links/<method>/<query>" hx-trigger="click"
-                hx-target="#links" hx-swap="innerHTML" hx-include="#add-form" hx-ext="path-params">
+            <button class="btn btn-primary form-control text-nowrap" hx-get="/" hx-trigger="click" hx-target="body"
+                hx-swap="innerHTML" hx-include="#search-form">
                 🔎 Search
             </button>
         </div>
-        <div class="p-1">
-            <button class="btn btn-success form-control text-nowrap" hx-get="/go/links" hx-trigger="click"
+        <div class=" p-1">
+            <!-- <button class="btn btn-success form-control text-nowrap" hx-get="/go/links" hx-trigger="click"
                 hx-target="#navbar-content" hx-swap="beforebegin">
                 + Add
-            </button>
+            </button> -->
         </div>
     </form>
 </div>
