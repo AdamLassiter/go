@@ -2,11 +2,11 @@
     <ul class="pagination">
         <li class="page-item {% if paging.page == 1 %}disabled{% endif %}">
             <a class="page-link" hx-get="{{ paging.source }}&page={{ paging.page - 1 }}&limit={{ paging.limit }}"
-                hx-target="{{ paging.target }}">Previous</a>
+                hx-swap="outerHTML" hx-target="{{ paging.target }}">Previous</a>
         </li>
         {% for n in 1..paging.page %}
         <li class="page-item">
-            <a class="page-link" hx-get="{{ paging.source }}&page={{ n }}&limit={{ paging.limit }}"
+            <a class="page-link" hx-get="{{ paging.source }}&page={{ n }}&limit={{ paging.limit }}" hx-swap="outerHTML"
                 hx-target="{{ paging.target }}">{{ n }}</a>
         </li>
         {% endfor %}
@@ -15,13 +15,13 @@
         </li>
         {% for n in paging.page+1..paging.last+1 %}
         <li class="page-item">
-            <a class="page-link" hx-get="{{ paging.source }}&page={{ n }}&limit={{ paging.limit }}"
+            <a class="page-link" hx-get="{{ paging.source }}&page={{ n }}&limit={{ paging.limit }}" hx-swap="outerHTML"
                 hx-target="{{ paging.target }}">{{ n }}</a>
         </li>
         {% endfor %}
         <li class="page-item {% if paging.page >= paging.last %}disabled{% endif %}">
             <a class="page-link" hx-get="{{ paging.source }}&page={{ paging.page + 1 }}&limit={{ paging.limit }}"
-                hx-target="{{ paging.target }}">Next</a>
+                hx-swap="outerHTML" hx-target="{{ paging.target }}">Next</a>
         </li>
     </ul>
 </nav>

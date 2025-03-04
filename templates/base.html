@@ -21,25 +21,29 @@
         let checkboxElem = document.getElementById(`is-alias-switch-${id}`);
         let textboxElem = document.getElementById(`target-input-${id}`);
         let labelElem = document.getElementById(`target-input-${id}-label`);
-        let isAlias = checkboxElem.checked;
-        textboxElem.type = isAlias ? "text" : "url";
-        textboxElem.placeholder = isAlias ? "go <alias>" : "https://example.com";
-        labelElem.textContent = isAlias ? "Alias" : "URL";
-    }
+        let isAlias = checkboxElem?.checked || false;
+        if (!!textboxElem) {
+            textboxElem.type = isAlias ? "text" : "url";
+            textboxElem.placeholder = isAlias ? "go <alias>" : "https://example.com";
+        }
+        if (!!labelElem) {
+            labelElem.textContent = isAlias ? "Alias" : "URL";
+            { }
+        }
 </script>
 
 <script>
-    htmx.defineExtension('path-params', {
-        onEvent: function (name, evt) {
-            if (name === "htmx:configRequest") {
-                evt.detail.path = evt.detail.path.replace(/<([A-Za-z0-9_]+)>/g, function (_, param) {
-                    let val = evt.detail.parameters[param];
-                    delete evt.detail.parameters[param]; // don't pass in query string since already in path
-                    return val;
-                })
+        htmx.defineExtension('path-params', {
+            onEvent: function (name, evt) {
+                if (name === "htmx:configRequest") {
+                    evt.detail.path = evt.detail.path.replace(/<([A-Za-z0-9_]+)>/g, function (_, param) {
+                        let val = evt.detail.parameters[param];
+                        delete evt.detail.parameters[param]; // don't pass in query string since already in path
+                        return val;
+                    })
+                }
             }
-        }
-    });
+        });
 </script>
 
 <body onload="syncSearchboxAndCheckbox()">

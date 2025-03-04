@@ -1,5 +1,3 @@
-#![feature(int_roundings)]
-
 mod handler;
 mod model;
 mod query;

@@ -55,10 +55,11 @@ async fn query_links_handler(
     };
     let (links, last) = query_links(&app_state, &query).await.map_err(db_err)?;
     let paging = Paging::new(&paging, &search, &sort, last, "/go/links", "#links");
+    let hx_push_url = paging.source.clone();
 
     let template_response = ListTemplate { links, paging }.render().map_err(tp_err)?;
 
-    Ok(Html(template_response))
+    Ok(([("HX-Push-Url", hx_push_url)], Html(template_response)))
 }
 
 async fn create_link_handler(
