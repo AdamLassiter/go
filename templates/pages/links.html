@@ -2,10 +2,12 @@
 
 {% block content %}
 <div class="container p-1">
-    <div id="links" hx-get="/go/links" hx-target="#links" hx-trigger="load" hx-swap="outerHTML">
-        <div class="spinner-border start-50 top-50" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
+  <div id="links"
+       hx-get="/go/links?&query={{ search.query }}&method={{ search.method }}&sort_by={{ sort.sort_by }}&order={{ sort.order }}&page={{ paging.page }}&limit={{ paging.limit }}"
+        hx-target="#links" hx-trigger="load" hx-swap="outerHTML" hx-ext="path-params">
+      <div class="spinner-border start-50 top-50" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
     </div>
 </div>
 {% endblock %}

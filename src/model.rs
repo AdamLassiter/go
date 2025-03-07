@@ -26,6 +26,7 @@ pub struct Paging {
     pub last: u64,
 
     pub source: String,
+    pub query: String,
     pub target: String,
 }
 impl Paging {
@@ -38,17 +39,25 @@ impl Paging {
         target: &str,
     ) -> Self {
         let PagingOptions { page, limit } = *paging;
-        let source = format!(
-            "{source}?{}{}",
-            search.as_query(),
-            sort.as_query()
-        );
+        let query = format!("?{}{}", search.as_query(), sort.as_query(),);
         Self {
             page,
             limit,
             last,
-            source,
+            source: source.to_string(),
+            query,
             target: target.to_string(),
         }
+    }
+    pub fn full_query(&self) -> String {
+        format!(
+            "{}{}",
+            self.query,
+            PagingOptions {
+                page: self.page,
+                limit: self.limit
+            }
+            .as_query()
+        )
     }
 }

@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{default, sync::Arc};
 
 use askama::Template;
 use axum::{
@@ -11,12 +11,12 @@ use axum::{
 
 use crate::{
     AppState,
-    model::Paging,
+    model::{Link, Paging},
     schema::{
-        CreateLink, DeleteLink, GetLink, PagingOptions, QueryLinks, SearchOptions, SortOptions,
-        UpdateLink, ViewOptions,
+        CreateLink, DeleteLink, FindLink, GetLink, PagingOptions, QueryLinks, SearchOptions,
+        SortOptions, UpdateLink, ViewOptions,
     },
-    service::{create_link, delete_link, edit_link, get_link, query_links},
+    service::{create_link, delete_link, edit_link, find_link, get_link, query_links},
     template::{EditTemplate, ErrorTemplate, LinksTemplate, ListTemplate, ViewTemplate},
 };
 
@@ -36,8 +36,18 @@ fn tp_err(err: askama::Error) -> (StatusCode, Html<String>) {
     )
 }
 
-pub async fn index_handler() -> Result<impl IntoResponse, (StatusCode, Html<String>)> {
-    let template_response = LinksTemplate {}.render().map_err(tp_err)?;
+pub async fn index_handler(
+    Query(paging): Query<PagingOptions>,
+    Query(search): Query<SearchOptions>,
+    Query(sort): Query<SortOptions>,
+) -> Result<impl IntoResponse, (StatusCode, Html<String>)> {
+    let template_response = LinksTemplate {
+        paging,
+        search,
+        sort,
+    }
+    .render()
+    .map_err(tp_err)?;
 
     Ok(Html(template_response))
 }
@@ -48,16 +58,32 @@ async fn query_links_handler(
     Query(search): Query<SearchOptions>,
     Query(sort): Query<SortOptions>,
 ) -> Result<impl IntoResponse, (StatusCode, Html<String>)> {
+    let find = FindLink {
+        source: search.query.clone(),
+    };
+    let link = find_link(&app_state, &find).await.map_err(db_err)?;
+    let new = match link {
+        Some(_) => None,
+        None => Some(CreateLink {
+            source: find.source,
+            is_alias: false,
+            target: "".to_string(),
+        }),
+    };
+
     let query = QueryLinks {
         paging,
         search: search.clone(),
         sort,
     };
     let (links, last) = query_links(&app_state, &query).await.map_err(db_err)?;
-    let paging = Paging::new(&paging, &search, &sort, last, "/go/links", "#links");
-    let hx_push_url = paging.source.clone();
 
-    let template_response = ListTemplate { links, paging }.render().map_err(tp_err)?;
+    let paging = Paging::new(&paging, &search, &sort, last, "/go/links", "#links");
+    let hx_push_url = paging.full_query();
+
+    let template_response = ListTemplate { new, links, paging }
+        .render()
+        .map_err(tp_err)?;
 
     Ok(([("HX-Push-Url", hx_push_url)], Html(template_response)))
 }

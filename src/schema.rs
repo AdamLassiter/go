@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize, Serialize, Debug, Default, Clone, Copy)]
+#[derive(Deserialize, Serialize, Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub enum SortMethod {
     #[default]
     Relevance,
@@ -15,7 +15,7 @@ impl Display for SortMethod {
         write!(f, "{:?}", self)
     }
 }
-#[derive(Deserialize, Serialize, Debug, Default, Clone, Copy)]
+#[derive(Deserialize, Serialize, Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub enum SortOrder {
     #[default]
     Descending,
@@ -26,7 +26,7 @@ impl Display for SortOrder {
         write!(f, "{:?}", self)
     }
 }
-#[derive(Deserialize, Serialize, Debug, Default, Clone, Copy)]
+#[derive(Deserialize, Serialize, Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct SortOptions {
     #[serde(default)]
     pub sort_by: SortMethod,
@@ -38,7 +38,11 @@ impl SortOptions {
         let Self { sort_by, order } = self;
         let sort_by = sort_by.to_string();
         let order = order.to_string();
-        format!("&sort_by={sort_by}&order={order}")
+        if self != &Self::default() {
+            format!("&sort_by={sort_by}&order={order}")
+        } else {
+            "".to_string()
+        }
     }
 }
 
@@ -49,7 +53,7 @@ fn default_limit() -> u64 {
     10
 }
 
-#[derive(Deserialize, Serialize, Debug, Default, Clone, Copy)]
+#[derive(Deserialize, Serialize, Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct PagingOptions {
     #[serde(default = "default_page")]
     pub page: u64,
@@ -62,11 +66,15 @@ impl PagingOptions {
     }
     pub fn as_query(&self) -> String {
         let Self { page, limit } = self;
-        format!("&page={page}&limit={limit}")
+        if self != &Self::default() {
+            format!("&page={page}&limit={limit}")
+        } else {
+            "".to_string()
+        }
     }
 }
 
-#[derive(Deserialize, Serialize, Debug, Default, Clone, Copy)]
+#[derive(Deserialize, Serialize, Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub enum SearchMethod {
     #[default]
     Semantic,
@@ -81,7 +89,7 @@ impl Display for SearchMethod {
     }
 }
 
-#[derive(Deserialize, Serialize, Debug, Default, Clone)]
+#[derive(Deserialize, Serialize, Debug, Default, Clone, PartialEq, Eq)]
 pub struct SearchOptions {
     #[serde(default)]
     pub query: String,
@@ -92,7 +100,11 @@ impl SearchOptions {
     pub fn as_query(&self) -> String {
         let Self { query, method } = self;
         let method = method.to_string();
-        format!("&query={query}&method={method}")
+        if self != &Self::default() {
+            format!("&query={query}&method={method}")
+        } else {
+            "".to_string()
+        }
     }
 }
 
@@ -121,8 +133,11 @@ pub struct FindLink {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct QueryLinks {
+    #[serde(flatten)]
     pub paging: PagingOptions,
+    #[serde(flatten)]
     pub search: SearchOptions,
+    #[serde(flatten)]
     pub sort: SortOptions,
 }
 

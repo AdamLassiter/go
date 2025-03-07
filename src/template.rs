@@ -1,6 +1,9 @@
 use askama::Template;
 
-use crate::model::{Link, Paging};
+use crate::{
+    model::{Link, Paging},
+    schema::{CreateLink, PagingOptions, SearchOptions, SortOptions},
+};
 
 #[derive(Template)]
 #[template(path = "links/view.html")]
@@ -17,13 +20,18 @@ pub struct EditTemplate {
 #[derive(Template)]
 #[template(path = "links/list.html")]
 pub struct ListTemplate {
+    pub new: Option<CreateLink>,
     pub links: Vec<Link>,
     pub paging: Paging,
 }
 
 #[derive(Template)]
 #[template(path = "pages/links.html")]
-pub struct LinksTemplate {}
+pub struct LinksTemplate {
+    pub paging: PagingOptions,
+    pub search: SearchOptions,
+    pub sort: SortOptions,
+}
 
 #[derive(Template)]
 #[template(path = "pages/error.html")]
