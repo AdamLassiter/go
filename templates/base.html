@@ -47,7 +47,19 @@
 </script>
 
 <body >
-    {%- include "utils/navbar.html" -%}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="/?" hx-push-url="true">🔎 Go!</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-content"
+                aria-controls="navbar-content" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse h-auto" id="navbar-content">
+                {% block nav_content %}
+                {% endblock %}
+            </div>
+        </div>
+    </nav>
     <div id="content">
         {% block content %}
         {%- include "utils/loading.html" -%}
