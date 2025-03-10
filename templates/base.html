@@ -28,8 +28,8 @@
         }
         if (!!labelElem) {
             labelElem.textContent = isAlias ? "Alias" : "URL";
-            { }
         }
+    }
 </script>
 
 <script>
@@ -46,7 +46,7 @@
         });
 </script>
 
-<body onload="syncSearchboxAndCheckbox()">
+<body >
     {%- include "utils/navbar.html" -%}
     <div id="content">
         {% block content %}

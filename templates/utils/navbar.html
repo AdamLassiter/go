@@ -6,7 +6,8 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse h-auto" id="navbar-content">
-            {%- include "links/search.html" -%}
+            {% block nav_content %}
+            {% endblock %}
         </div>
     </div>
 </nav>

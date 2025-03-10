@@ -1,4 +1,10 @@
 <div id="links" class="col">
+    {% if new.is_some() %}
+    <div id="new-link-content" class="col py-3">
+        {% let link = new.as_ref().unwrap() %}
+        {%- include "links/create.html" -%}
+    </div>
+    {% endif %}
     <div id="links-content" class="col">
         {% for link in links %}
         {%- include "links/view.html" -%}

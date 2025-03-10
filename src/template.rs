@@ -7,6 +7,12 @@ use crate::{
 
 #[derive(Template)]
 #[template(path = "links/view.html")]
+pub struct CreateTemplate {
+    pub link: Link,
+}
+
+#[derive(Template)]
+#[template(path = "links/view.html")]
 pub struct ViewTemplate {
     pub link: Link,
 }
@@ -23,6 +29,12 @@ pub struct ListTemplate {
     pub new: Option<CreateLink>,
     pub links: Vec<Link>,
     pub paging: Paging,
+}
+
+#[derive(Template)]
+#[template(path = "links/search.html")]
+pub struct SearchTemplate {
+    pub search: SearchOptions,
 }
 
 #[derive(Template)]

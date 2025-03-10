@@ -3,7 +3,7 @@
         <div class="p-1 flex-grow-1">
             <div class="input-group my-auto flex-grow-1">
                 <input class="form-control flex-grow-1" placeholder="go <alias>" required type="text" name="query"
-                    aria-describedby="source-input-search-label">
+          aria-describedby="source-input-search-label" value="{{ search.query }}">
                 <input required type="hidden" name="method" value="Semantic" />
             </div>
         </div>
@@ -12,12 +12,6 @@
                 hx-target="#links" hx-swap="outerHTML" hx-include="#search-form">
                 🔎 Search
             </button>
-        </div>
-        <div class=" p-1">
-            <!-- <button class="btn btn-success form-control text-nowrap" hx-get="/go/links" hx-trigger="click"
-                hx-target="#navbar-content" hx-swap="beforebegin">
-                + Add
-            </button> -->
         </div>
     </form>
 </div>

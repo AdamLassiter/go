@@ -1,4 +1,4 @@
-use std::{default, sync::Arc};
+use std::sync::Arc;
 
 use askama::Template;
 use axum::{
@@ -11,7 +11,7 @@ use axum::{
 
 use crate::{
     AppState,
-    model::{Link, Paging},
+    model::Paging,
     schema::{
         CreateLink, DeleteLink, FindLink, GetLink, PagingOptions, QueryLinks, SearchOptions,
         SortOptions, UpdateLink, ViewOptions,
@@ -63,12 +63,12 @@ async fn query_links_handler(
     };
     let link = find_link(&app_state, &find).await.map_err(db_err)?;
     let new = match link {
-        Some(_) => None,
-        None => Some(CreateLink {
+        None if !find.source.is_empty() => Some(CreateLink {
             source: find.source,
             is_alias: false,
             target: "".to_string(),
         }),
+        _ => None,
     };
 
     let query = QueryLinks {

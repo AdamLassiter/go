@@ -6,7 +6,7 @@
                     <div class="input-group">
                         <span id="source-input-create-label" class="input-group-text">Alias</span>
                         <input class="form-control form-control-sm p-1" placeholder="go <alias>" required type="text"
-                            name="source" value="{{ link.source }}" aria-labelledby="source-input-create-label">
+                            name="source" value="{{ link.source }}" readonly aria-labelledby="source-input-create-label">
                     </div>
                 </div>
                 <div class="p-1 my-auto">
@@ -23,12 +23,6 @@
                             placeholder="Target URL" required type="url" name="target" value="{{ link.target }}"
                             aria-labelledby="target-input-create-label">
                     </div>
-                </div>
-                <div class="p-1">
-                    <button class="btn btn-sm btn-secondary form-control text-nowrap"
-                        hx-trigger="click" hx-target="#link-create" hx-swap="delete">
-                        🗙 Cancel
-                    </button>
                 </div>
                 <div class="p-1">
                     <button class="btn btn-sm btn-primary form-control text-nowrap" hx-post="/go/links"
