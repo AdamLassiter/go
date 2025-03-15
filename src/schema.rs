@@ -32,6 +32,7 @@ pub struct SortOptions {
     #[serde(default)]
     pub order: SortOrder,
 }
+#[allow(dead_code)]
 impl SortOptions {
     pub fn as_query(&self) -> String {
         let Self { sort_by, order } = self;

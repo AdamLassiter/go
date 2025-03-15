@@ -14,7 +14,7 @@ use crate::{
     model::Paging,
     schema::{
         CreateLink, DeleteLink, FindLink, GetLink, PagingOptions, QueryLinks, SearchOptions,
-        SortOptions, UpdateLink, ViewOptions,
+        UpdateLink, ViewOptions,
     },
     service::{create_link, delete_link, edit_link, find_link, get_link, query_links},
     template::{EditTemplate, ErrorTemplate, LinksTemplate, ListTemplate, ViewTemplate},
@@ -39,15 +39,8 @@ fn tp_err(err: askama::Error) -> (StatusCode, Html<String>) {
 pub async fn index_handler(
     Query(paging): Query<PagingOptions>,
     Query(search): Query<SearchOptions>,
-    Query(sort): Query<SortOptions>,
 ) -> Result<impl IntoResponse, (StatusCode, Html<String>)> {
-    let template_response = LinksTemplate {
-        paging,
-        search,
-        sort,
-    }
-    .render()
-    .map_err(tp_err)?;
+    let template_response = LinksTemplate { paging, search }.render().map_err(tp_err)?;
 
     Ok(Html(template_response))
 }
@@ -56,7 +49,6 @@ async fn query_links_handler(
     State(app_state): State<Arc<AppState>>,
     Query(paging): Query<PagingOptions>,
     Query(search): Query<SearchOptions>,
-    Query(sort): Query<SortOptions>,
 ) -> Result<impl IntoResponse, (StatusCode, Html<String>)> {
     let find = FindLink {
         source: search.query.clone(),
@@ -77,7 +69,7 @@ async fn query_links_handler(
     };
     let (links, last) = query_links(&app_state, &query).await.map_err(db_err)?;
 
-    let paging = Paging::new(&paging, &search, &sort, last, "/go/links", "#links");
+    let paging = Paging::new(&paging, &search, last, "/go/links", "#links");
     let hx_push_url = paging.full_query();
 
     let template_response = ListTemplate { new, links, paging }

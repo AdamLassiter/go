@@ -23,9 +23,12 @@ pub async fn resolve_alias(
         let head = links.last().unwrap();
         println!("🔃 Alias definition '{}' -> '{}'", head.source, head.target);
 
-        let resolved = find_link(&app_state.clone(), &FindLink {
-            source: head.target.clone(),
-        })
+        let resolved = find_link(
+            &app_state.clone(),
+            &FindLink {
+                source: head.target.clone(),
+            },
+        )
         .await?;
 
         if resolved.is_none() {

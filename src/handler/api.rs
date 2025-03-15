@@ -14,7 +14,7 @@ use crate::{
     model::Paging,
     schema::{
         CreateLink, DeleteLink, FindLink, GetLink, PagingOptions, QueryLinks, SearchOptions,
-        SortOptions, UpdateLink,
+        UpdateLink,
     },
     service::{create_link, delete_link, edit_link, find_link, get_link, query_links},
 };
@@ -81,14 +81,13 @@ async fn query_links_handler(
     State(app_state): State<Arc<AppState>>,
     Query(paging): Query<PagingOptions>,
     Query(search): Query<SearchOptions>,
-    Query(sort): Query<SortOptions>,
 ) -> Result<Json<Value>, (StatusCode, Json<Value>)> {
     let query = QueryLinks {
         paging,
         search: search.clone(),
     };
     let (links, last) = query_links(&app_state, &query).await.map_err(db_err)?;
-    let paging = Paging::new(&paging, &search, &sort, last, "/api/links", "");
+    let paging = Paging::new(&paging, &search, last, "/api/links", "");
 
     let json_response = json!({
         "paging": paging,
@@ -130,11 +129,13 @@ async fn find_link_handler(
     State(app_state): State<Arc<AppState>>,
     Query(search): Query<SearchOptions>,
     Query(paging): Query<PagingOptions>,
-    Query(sort): Query<SortOptions>,
 ) -> Result<Json<Value>, (StatusCode, Json<Value>)> {
-    let link = find_link(&app_state, &FindLink {
-        source: search.query.clone(),
-    })
+    let link = find_link(
+        &app_state,
+        &FindLink {
+            source: search.query.clone(),
+        },
+    )
     .await
     .map_err(db_err)?;
     if let Some(link) = link {
@@ -144,7 +145,7 @@ async fn find_link_handler(
 
         Ok(Json(link_response))
     } else {
-        query_links_handler(State(app_state), Query(paging), Query(search), Query(sort)).await
+        query_links_handler(State(app_state), Query(paging), Query(search)).await
     }
 }
 

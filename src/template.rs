@@ -2,7 +2,7 @@ use askama::Template;
 
 use crate::{
     model::{Link, Paging},
-    schema::{CreateLink, PagingOptions, SearchOptions, SortOptions},
+    schema::{CreateLink, PagingOptions, SearchOptions},
 };
 
 #[derive(Template)]
@@ -42,7 +42,6 @@ pub struct SearchTemplate {
 pub struct LinksTemplate {
     pub paging: PagingOptions,
     pub search: SearchOptions,
-    pub sort: SortOptions,
 }
 
 #[derive(Template)]
