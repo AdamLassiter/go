@@ -7,9 +7,9 @@
 {% block content %}
 <div class="container p-1">
   <div id="links"
-        hx-get="/go/links?&query={{ search.query }}&method={{ search.method }}&sort_by={{ sort.sort_by }}&order={{ sort.order }}&page={{ paging.page }}&limit={{ paging.limit }}"
-        hx-target="#links" hx-trigger="load" hx-swap="outerHTML" hx-ext="path-params">
-        {%- include "utils/loading.html" -%} 
-    </div>
+    hx-get="/go/links?&query={{ search.query }}&method={{ search.method }}&sort_by={{ sort.sort_by }}&order={{ sort.order }}&page={{ paging.page }}&limit={{ paging.limit }}"
+    hx-target="#links" hx-trigger="load" hx-swap="outerHTML" hx-ext="path-params">
+    {%- include "utils/loading.html" -%} 
+  </div>
 </div>
 {% endblock %}

@@ -1,42 +1,42 @@
 <div id="link-{{ link.id }}" class="row py-1">
-    <div id="link-{{ link.id }}-card" class="card p-0">
-        <form id="edit-form" class="container-fluid p-0">
-            <div class="card-body d-flex flex-row p-1">
-                <div class="col-2 px-1 my-auto">
-                    <div class="input-group">
-                        <span id="source-input-{{ link.id }}-label" class="input-group-text">Alias</span>
-                        <input class="form-control form-control-sm p-1" placeholder="go <alias>" required type="text"
-                            name="source" value="{{ link.source }}" aria-labelledby="source-input-{{ link.id }}-label">
-                    </div>
-                </div>
-                <div class="p-1 my-auto">
-                    <div class="form-check form-switch">
-                        <input id="is-alias-switch-{{ link.id }}" class="form-check-input" required type="checkbox"
-                            value="{{ link.is_alias }}" onchange="syncSearchboxAndCheckbox('{{ link.id }}')">
-                        <span for="is-alias-switch" class="form-check-label">Alias?</span>
-                    </div>
-                </div>
-                <div class="flex-grow-1 px-1 my-auto">
-                    <div class="input-group">
-                        <span id="target-input-{{ link.id }}-label" class="input-group-text">URL</span>
-                        <input id="target-input-{{ link.id }}" class="form-control form-control-sm p-1"
-                            placeholder="Target URL" required type="url" name="target" value="{{ link.target }}"
-                            aria-labelledby="target-input-{{ link.id }}-label">
-                    </div>
-                </div>
-                <div class="p-1">
-                    <button class="btn btn-sm btn-secondary form-control text-nowrap" hx-get="/go/link/{{ link.id }}"
-                        hx-trigger="click" hx-target="#link-{{ link.id }}" hx-swap="outerHTML">
-                        🗙 Cancel
-                    </button>
-                </div>
-                <div class="p-1">
-                    <button class="btn btn-sm btn-primary form-control text-nowrap" hx-put="/go/link/{{ link.id }}"
-                        hx-trigger="click" hx-target="#link-{{ link.id }}" hx-swap="outerHTML">
-                        💾 Save
-                    </button>
-                </div>
-            </div>
-        </form>
-    </div>
+  <div id="link-{{ link.id }}-card" class="card p-0">
+    <form id="edit-form" class="container-fluid p-0">
+      <div class="card-body d-flex flex-row p-1">
+        <div class="col-2 px-1 my-auto">
+          <div class="input-group">
+            <span id="source-input-{{ link.id }}-label" class="input-group-text">Alias</span>
+            <input class="form-control form-control-sm p-1" placeholder="go <alias>" required type="text"
+              name="source" value="{{ link.source }}" aria-labelledby="source-input-{{ link.id }}-label">
+          </div>
+        </div>
+        <div class="p-1 my-auto">
+          <div class="form-check form-switch">
+            <input id="is-alias-switch-{{ link.id }}" class="form-check-input" required type="checkbox"
+              value="{{ link.is_alias }}" onchange="syncSearchboxAndCheckbox('{{ link.id }}')">
+            <span for="is-alias-switch" class="form-check-label">Alias?</span>
+          </div>
+        </div>
+        <div class="flex-grow-1 px-1 my-auto">
+          <div class="input-group">
+            <span id="target-input-{{ link.id }}-label" class="input-group-text">URL</span>
+            <input id="target-input-{{ link.id }}" class="form-control form-control-sm p-1"
+              placeholder="Target URL" required type="url" name="target" value="{{ link.target }}"
+              aria-labelledby="target-input-{{ link.id }}-label">
+          </div>
+        </div>
+        <div class="p-1">
+          <button class="btn btn-sm btn-outline-secondary form-control text-nowrap" hx-get="/go/link/{{ link.id }}"
+            hx-trigger="click" hx-target="#link-{{ link.id }}" hx-swap="outerHTML">
+            🗙 Cancel
+          </button>
+        </div>
+        <div class="p-1">
+          <button class="btn btn-sm btn-outline-primary form-control text-nowrap" hx-put="/go/link/{{ link.id }}"
+            hx-trigger="click" hx-target="#link-{{ link.id }}" hx-swap="outerHTML">
+            💾 Save
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
 </div>

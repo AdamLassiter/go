@@ -1,3 +1,6 @@
+#![feature(async_fn_traits)]
+#![feature(let_chains)]
+
 mod handler;
 mod model;
 mod query;
@@ -53,12 +56,9 @@ async fn main() -> Result<(), Error> {
 async fn init_db() -> Result<Pool<Sqlite>, Error> {
     let conn_opts = SqliteConnectOptions::new()
         .filename(env::var("DATABASE_FILENAME").expect("DATABASE_FILENAME not set"))
-        .extension("extensions/vec0")
-        .extension("extensions/lembed0")
-        .extension("extensions/damerau_levenshtein0")
-        .extension("extensions/levenshtein0")
-        .extension("extensions/metaphone0")
-        .extension("extensions/soundex0")
+        .extension("extensions/vec")
+        .extension("extensions/lembed")
+        .extension("extensions/fuzzy")
         .create_if_missing(true);
 
     let pool_opts = SqlitePoolOptions::new().after_connect(|conn, _meta| {

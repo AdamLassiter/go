@@ -9,12 +9,7 @@ use axum::{
     routing::get,
 };
 
-use crate::{
-    AppState,
-    schema::{FindLink, SearchOptions},
-    service::find_link,
-    template::ErrorTemplate,
-};
+use crate::{AppState, schema::SearchOptions, service::resolve_alias, template::ErrorTemplate};
 
 fn db_err(err: sqlx::Error) -> (StatusCode, Html<String>) {
     eprintln!("{}", err);
@@ -28,13 +23,11 @@ async fn find_link_handler(
     State(app_state): State<Arc<AppState>>,
     Query(search): Query<SearchOptions>,
 ) -> Result<impl IntoResponse, (StatusCode, Html<String>)> {
-    let link = find_link(&app_state, &FindLink {
-        source: search.query.clone(),
-    })
-    .await
-    .map_err(db_err)?;
+    let resolved = resolve_alias(app_state, search.query.clone())
+        .await
+        .map_err(db_err)?;
 
-    if let Some(link) = link {
+    if let Some(link) = resolved {
         Ok(Redirect::to(&link.target))
     } else {
         let path = format!("/?query={}&method={}", search.query, search.method);

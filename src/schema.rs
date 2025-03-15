@@ -5,7 +5,6 @@ use serde::{Deserialize, Serialize};
 #[derive(Deserialize, Serialize, Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub enum SortMethod {
     #[default]
-    Relevance,
     Alphabetical,
     Created,
     Updated,
@@ -78,17 +77,13 @@ impl PagingOptions {
 pub enum SearchMethod {
     #[default]
     Semantic,
-    Metaphone,
-    Soundex,
     DamerauLevenshtein,
-    Levenshtein,
 }
 impl Display for SearchMethod {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{:?}", self)
     }
 }
-
 #[derive(Deserialize, Serialize, Debug, Default, Clone, PartialEq, Eq)]
 pub struct SearchOptions {
     #[serde(default)]
@@ -137,8 +132,6 @@ pub struct QueryLinks {
     pub paging: PagingOptions,
     #[serde(flatten)]
     pub search: SearchOptions,
-    #[serde(flatten)]
-    pub sort: SortOptions,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

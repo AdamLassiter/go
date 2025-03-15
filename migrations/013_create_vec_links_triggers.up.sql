@@ -1,12 +1,12 @@
 create trigger if not exists vec_links_inserter
-before insert on links
+after insert on links
 begin
   insert into vec_links (rowid, vec_source, vec_description)
   values (new.id, lembed(new.source), lembed(new.description));
 end;
 
 create trigger if not exists vec_links_updater
-before update on links
+after update on links
 begin
   update vec_links
   set (vec_source, vec_description)
@@ -15,7 +15,7 @@ begin
 end;
 
 create trigger if not exists vec_links_deleter
-before delete on links
+after delete on links
 begin
   delete from vec_links
   where rowid = old.id;

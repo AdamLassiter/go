@@ -1,17 +1,22 @@
 <div class="d-flex flex-row flex-grow-1">
-    <form id="search-form" class="d-flex flex-row flex-grow-1" method="get">
-        <div class="p-1 flex-grow-1">
-            <div class="input-group my-auto flex-grow-1">
-                <input class="form-control flex-grow-1" placeholder="go <alias>" required type="text" name="query"
-          aria-describedby="source-input-search-label" value="{{ search.query }}">
-                <input required type="hidden" name="method" value="Semantic" />
-            </div>
-        </div>
-        <div class="p-1">
-            <button class="btn btn-primary form-control text-nowrap" hx-get="/go/links" hx-trigger="click"
-                hx-target="#links" hx-swap="outerHTML" hx-include="#search-form">
-                🔎 Search
-            </button>
-        </div>
-    </form>
+  <form id="search-form" class="d-flex flex-row flex-grow-1" method="get">
+    <div class="p-1 flex-grow-1">
+      <div class="input-group my-auto flex-grow-1">
+        <input class="form-control flex-grow-1" placeholder="go <alias>" required type="text" name="query"
+      aria-describedby="source-input-search-label" value="{{ search.query }}">
+      </div>
+    </div>
+    <div class="p-1">
+      <div class="input-group">
+        <select class="form-select" id="search-strategy" name="method">
+          <option selected value="Semantic">Semantic</option>
+          <option value="DamerauLevenshtein">Dam. Lev.</option>
+        </select>
+        <button class="btn btn-outline-primary text-nowrap" hx-get="/go/links" hx-trigger="click"
+          hx-target="#links" hx-swap="outerHTML" hx-include="#search-form">
+          🔎 Search
+        </button>
+      </div>
+    </div>
+  </form>
 </div>

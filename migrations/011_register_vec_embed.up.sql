@@ -1,3 +1,3 @@
 -- pragma load_extension = 1;
--- .load extensions/vec0;
--- .load extensions/lembed0;
+-- .load extensions/vec;
+-- .load extensions/lembed;

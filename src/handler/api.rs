@@ -10,9 +10,13 @@ use serde_json::{Value, json};
 use sqlx::Error;
 
 use crate::{
-    model::Paging, schema::{
-        CreateLink, DeleteLink, FindLink, GetLink, PagingOptions, QueryLinks, SearchOptions, SortOptions, UpdateLink
-    }, service::{create_link, delete_link, edit_link, find_link, get_link, query_links}, AppState
+    AppState,
+    model::Paging,
+    schema::{
+        CreateLink, DeleteLink, FindLink, GetLink, PagingOptions, QueryLinks, SearchOptions,
+        SortOptions, UpdateLink,
+    },
+    service::{create_link, delete_link, edit_link, find_link, get_link, query_links},
 };
 
 fn db_err(err: Error) -> (StatusCode, Json<Value>) {
@@ -82,7 +86,6 @@ async fn query_links_handler(
     let query = QueryLinks {
         paging,
         search: search.clone(),
-        sort,
     };
     let (links, last) = query_links(&app_state, &query).await.map_err(db_err)?;
     let paging = Paging::new(&paging, &search, &sort, last, "/api/links", "");

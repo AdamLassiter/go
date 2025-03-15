@@ -1,5 +1,2 @@
 -- pragma load_extension = 1;
--- .load extensions/damerau_levenshtein0;
--- .load extensions/levenshtein0;
--- .load extensions/metaphone0;
--- .load extensions/soundex0;
+-- .load extensions/fuzzy;

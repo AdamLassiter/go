@@ -2,69 +2,69 @@
 <html lang="en">
 
 <head>
-    <script src="https://cdn.jsdelivr.net/npm/htmx.org@1.9.12"
-        integrity="sha512-JvpjarJlOl4sW26MnEb3IdSAcGdeTeOaAlu2gUZtfFrRgnChdzELOZKl0mN6ZvI0X+xiX5UMvxjK2Rx2z/fliw=="
-        crossorigin="anonymous"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha512-jnSuA4Ss2PkkikSOLtYs8BlYIeeIK1h99ty4YfvRPAlzr377vr3CXDb7sb7eEEBYjDtcYj+AjBH3FLv5uSJuXg=="
-        crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha512-7Pi/otdlbbCR+LnW+F7PwFcSDJOuUJB3OxtEHbg4vSMvzvJjde4Po1v4BR9Gdc9aXNUNFVUY+SK51wWT8WF0Gg=="
-        crossorigin="anonymous"></script>
-    <title>Go!</title>
-    {% block head %}{% endblock %}
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@1.9.12"
+    integrity="sha512-JvpjarJlOl4sW26MnEb3IdSAcGdeTeOaAlu2gUZtfFrRgnChdzELOZKl0mN6ZvI0X+xiX5UMvxjK2Rx2z/fliw=="
+    crossorigin="anonymous"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha512-jnSuA4Ss2PkkikSOLtYs8BlYIeeIK1h99ty4YfvRPAlzr377vr3CXDb7sb7eEEBYjDtcYj+AjBH3FLv5uSJuXg=="
+    crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha512-7Pi/otdlbbCR+LnW+F7PwFcSDJOuUJB3OxtEHbg4vSMvzvJjde4Po1v4BR9Gdc9aXNUNFVUY+SK51wWT8WF0Gg=="
+    crossorigin="anonymous"></script>
+  <title>Go!</title>
+  {% block head %}{% endblock %}
 </head>
 
 <script>
-    // see utils/navbar.html
-    function syncSearchboxAndCheckbox(id) {
-        let checkboxElem = document.getElementById(`is-alias-switch-${id}`);
-        let textboxElem = document.getElementById(`target-input-${id}`);
-        let labelElem = document.getElementById(`target-input-${id}-label`);
-        let isAlias = checkboxElem?.checked || false;
-        if (!!textboxElem) {
-            textboxElem.type = isAlias ? "text" : "url";
-            textboxElem.placeholder = isAlias ? "go <alias>" : "https://example.com";
-        }
-        if (!!labelElem) {
-            labelElem.textContent = isAlias ? "Alias" : "URL";
-        }
+  // see utils/navbar.html
+  function syncSearchboxAndCheckbox(id) {
+    let checkboxElem = document.getElementById(`is-alias-switch-${id}`);
+    let textboxElem = document.getElementById(`target-input-${id}`);
+    let labelElem = document.getElementById(`target-input-${id}-label`);
+    let isAlias = checkboxElem?.checked || false;
+    if (!!textboxElem) {
+      textboxElem.type = isAlias ? "text" : "url";
+      textboxElem.placeholder = isAlias ? "go <alias>" : "https://example.com";
     }
+    if (!!labelElem) {
+      labelElem.textContent = isAlias ? "Alias" : "URL";
+    }
+  }
 </script>
 
 <script>
-        htmx.defineExtension('path-params', {
-            onEvent: function (name, evt) {
-                if (name === "htmx:configRequest") {
-                    evt.detail.path = evt.detail.path.replace(/<([A-Za-z0-9_]+)>/g, function (_, param) {
-                        let key = evt.detail.parameters[param];
-                        delete evt.detail.parameters[param]; // don't pass in query string since already in path
-                        return key;
-                    })
-                }
-            }
-        });
+  htmx.defineExtension('path-params', {
+    onEvent: function (name, evt) {
+      if (name === "htmx:configRequest") {
+        evt.detail.path = evt.detail.path.replace(/<([A-Za-z0-9_]+)>/g, function (_, param) {
+          let key = evt.detail.parameters[param];
+          delete evt.detail.parameters[param]; // don't pass in query string since already in path
+          return key;
+        })
+      }
+    }
+  });
 </script>
 
-<body >
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-            <a class="navbar-brand" href="/?" hx-push-url="true">🔎 Go!</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-content"
-                aria-controls="navbar-content" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse h-auto" id="navbar-content">
-                {% block nav_content %}
-                {% endblock %}
-            </div>
-        </div>
-    </nav>
-    <div id="content">
-        {% block content %}
-        {%- include "utils/loading.html" -%}
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+      <a class="navbar-brand" href="/?" hx-push-url="true">🔎 Go!</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-content"
+        aria-controls="navbar-content" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse h-auto" id="navbar-content">
+        {% block nav_content %}
         {% endblock %}
+      </div>
     </div>
+  </nav>
+  <div id="content">
+    {% block content %}
+    {%- include "utils/loading.html" -%}
+    {% endblock %}
+  </div>
 </body>
 
 </html>

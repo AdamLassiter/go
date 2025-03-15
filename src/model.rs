@@ -4,7 +4,7 @@ use sqlx::FromRow;
 
 use crate::schema::{PagingOptions, SearchOptions, SortOptions};
 
-#[derive(Debug, FromRow, Deserialize, Serialize)]
+#[derive(Debug, FromRow, Deserialize, Serialize, PartialEq, Eq)]
 pub struct Link {
     pub id: i64,
 

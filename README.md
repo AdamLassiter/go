@@ -114,19 +114,3 @@ Bootstrap provides a vast array of CSS classes that can be combined to achieve m
   <label class="btn btn-outline-danger" for="btnradio3">Radio 3</label>
 </div>
 ```
-
-
-# Some Ideas
-
-* links/
-  * search
-  * view
-  * list
-  * edit
-  * create
-* pages/
-  * popular
-  * recent
-  * mine
-* utils/
-  * paging

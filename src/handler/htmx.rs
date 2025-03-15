@@ -74,7 +74,6 @@ async fn query_links_handler(
     let query = QueryLinks {
         paging,
         search: search.clone(),
-        sort,
     };
     let (links, last) = query_links(&app_state, &query).await.map_err(db_err)?;
 

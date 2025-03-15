@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use sqlx::Error;
 
 use crate::{
@@ -6,18 +8,49 @@ use crate::{
     schema::{CreateLink, DeleteLink, FindLink, GetLink, QueryLinks, UpdateLink},
 };
 
+pub async fn resolve_alias(
+    app_state: Arc<AppState>,
+    initial: String,
+) -> Result<Option<Link>, Error> {
+    let initial = find_link(&app_state.clone(), &FindLink { source: initial }).await?;
+
+    if initial.is_none() {
+        return Ok(None);
+    }
+    let mut links = vec![initial.unwrap()];
+
+    loop {
+        let head = links.last().unwrap();
+        println!("🔃 Alias definition '{}' -> '{}'", head.source, head.target);
+
+        let resolved = find_link(&app_state.clone(), &FindLink {
+            source: head.target.clone(),
+        })
+        .await?;
+
+        if resolved.is_none() {
+            return Ok(None);
+        }
+        let link = resolved.unwrap();
+
+        if !link.is_alias {
+            return Ok(Some(link));
+        }
+        if links.contains(&link) {
+            println!("♾️ Recursive alias definition '{}'", link.source);
+            return Err(Error::RowNotFound);
+        }
+        links.push(link);
+    }
+}
+
 pub async fn query_links(
     app_state: &AppState,
     query: &QueryLinks,
 ) -> Result<(Vec<Link>, u64), Error> {
     println!(
-        "💽 Search for '{}' with strategy '{}', page '{}' size '{}', sorted by '{}' '{}'",
-        query.search.query,
-        query.search.method,
-        query.paging.page,
-        query.paging.limit,
-        query.sort.sort_by,
-        query.sort.order
+        "💽 Search for '{}' with strategy '{}', page '{}' size '{}'",
+        query.search.query, query.search.method, query.paging.page, query.paging.limit,
     );
     let links = query.as_query().fetch_all(&app_state.db).await?;
     let count = query.as_count().fetch_one(&app_state.db).await?;
