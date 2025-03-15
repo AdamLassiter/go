@@ -6,7 +6,7 @@ create table if not exists links (
   source text not null,
   is_alias boolean not null,
   target text not null,
-  description text default source,
+  description text default '',
   
   unique (source) on conflict rollback
 );

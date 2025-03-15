@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 
 <head>
   <script src="https://cdn.jsdelivr.net/npm/htmx.org@1.9.12"
@@ -15,7 +15,7 @@
   {% block head %}{% endblock %}
 </head>
 
-<script>
+<script type="text/javascript">
   // see utils/navbar.html
   function syncSearchboxAndCheckbox(id) {
     let checkboxElem = document.getElementById(`is-alias-switch-${id}`);
@@ -32,22 +32,19 @@
   }
 </script>
 
-<script>
-  htmx.defineExtension('path-params', {
-    onEvent: function (name, evt) {
-      if (name === "htmx:configRequest") {
-        evt.detail.path = evt.detail.path.replace(/<([A-Za-z0-9_]+)>/g, function (_, param) {
-          let key = evt.detail.parameters[param];
-          delete evt.detail.parameters[param]; // don't pass in query string since already in path
-          return key;
-        })
-      }
+<script type="text/javascript">
+  function toggleDarkMode() {
+    if (document.documentElement.getAttribute("data-bs-theme") == "dark") {
+      document.documentElement.setAttribute("data-bs-theme","light");
     }
-  });
+    else {
+      document.documentElement.setAttribute("data-bs-theme","dark");
+    }
+  }
 </script>
 
 <body>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <nav class="navbar navbar-expand-lg">
     <div class="container">
       <a class="navbar-brand" href="/?" hx-push-url="true">🔎 Go!</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-content"
@@ -57,6 +54,9 @@
       <div class="collapse navbar-collapse h-auto" id="navbar-content">
         {% block nav_content %}
         {% endblock %}
+        <button id="dark-mode" class="btn btn-outline-secondary" onclick="toggleDarkMode()">
+          ☀️🌙
+        </button>
       </div>
     </div>
   </nav>
