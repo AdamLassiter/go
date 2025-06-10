@@ -21,7 +21,7 @@ use crate::{
 };
 
 fn db_err(err: sqlx::Error) -> (StatusCode, Html<String>) {
-    eprintln!("{}", err);
+    eprintln!("{err}");
     (
         StatusCode::BAD_REQUEST,
         Html(ErrorTemplate {}.render().unwrap_or("Oops!".to_string())),
@@ -29,7 +29,7 @@ fn db_err(err: sqlx::Error) -> (StatusCode, Html<String>) {
 }
 
 fn tp_err(err: askama::Error) -> (StatusCode, Html<String>) {
-    eprintln!("{}", err);
+    eprintln!("{err}");
     (
         StatusCode::BAD_REQUEST,
         Html(ErrorTemplate {}.render().unwrap_or("Oops!".to_string())),

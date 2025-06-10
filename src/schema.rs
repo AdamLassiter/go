@@ -11,7 +11,7 @@ pub enum SortMethod {
 }
 impl Display for SortMethod {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self)
+        write!(f, "{self:?}")
     }
 }
 #[derive(Deserialize, Serialize, Debug, Default, Clone, Copy, PartialEq, Eq)]
@@ -22,7 +22,7 @@ pub enum SortOrder {
 }
 impl Display for SortOrder {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self)
+        write!(f, "{self:?}")
     }
 }
 #[derive(Deserialize, Serialize, Debug, Default, Clone, Copy, PartialEq, Eq)]
@@ -82,7 +82,7 @@ pub enum SearchMethod {
 }
 impl Display for SearchMethod {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self)
+        write!(f, "{self:?}")
     }
 }
 #[derive(Deserialize, Serialize, Debug, Default, Clone, PartialEq, Eq)]

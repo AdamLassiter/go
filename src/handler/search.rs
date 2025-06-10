@@ -12,7 +12,7 @@ use axum::{
 use crate::{AppState, schema::SearchOptions, service::resolve_alias, template::ErrorTemplate};
 
 fn db_err(err: sqlx::Error) -> (StatusCode, Html<String>) {
-    eprintln!("{}", err);
+    eprintln!("{err}");
     (
         StatusCode::BAD_REQUEST,
         Html(ErrorTemplate {}.render().unwrap_or("Oops!".to_string())),

@@ -1,6 +1,3 @@
-#![feature(async_fn_traits)]
-#![feature(let_chains)]
-
 mod handler;
 mod model;
 mod query;
