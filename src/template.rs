@@ -5,6 +5,7 @@ use crate::{
     schema::{CreateLink, PagingOptions, SearchOptions},
 };
 
+#[allow(dead_code)]
 #[derive(Template)]
 #[template(path = "links/view.html")]
 pub struct CreateTemplate {
@@ -31,6 +32,7 @@ pub struct ListTemplate {
     pub paging: Paging,
 }
 
+#[allow(dead_code)]
 #[derive(Template)]
 #[template(path = "links/search.html")]
 pub struct SearchTemplate {
